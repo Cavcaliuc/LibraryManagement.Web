@@ -35,7 +35,7 @@ namespace LibraryManagement.Web.Models
         public DbSet<Category> Categories { get; set; }
         public DbSet<Condition> Conditions { get; set; }
         public DbSet<Gender> Genders { get; set; }
-        public DbSet<Country> Contries { get; set; }
+        public DbSet<Country> Countries { get; set; }
         public DbSet<Status> Statuses { get; set; }
 
         //Entities
