@@ -29,8 +29,14 @@
             context.ActionTypes.AddOrUpdate(actionType3);
             #endregion ActionTypes
 
-            var moldova = new Country { Id = 1, Name = "Moldova" };
-            context.Countries.AddOrUpdate(moldova);
+
+
+            var moldova = context.Countries.FirstOrDefault(x => x.Name == "Moldova");
+            if (moldova == null)
+            {
+                moldova = new Country { Id = 1, Name = "Moldova" };
+                context.Countries.AddOrUpdate(moldova);
+            }
 
             #region Cities
             //cities
