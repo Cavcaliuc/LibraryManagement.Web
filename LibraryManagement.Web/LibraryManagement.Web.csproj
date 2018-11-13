@@ -197,6 +197,9 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActionTypeController.cs" />
     <Compile Include="Controllers\AuthorsController.cs" />
+    <Compile Include="Controllers\CategoryController.cs" />
+    <Compile Include="Controllers\ConditionController.cs" />
+    <Compile Include="Controllers\CountryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -292,6 +295,21 @@
     <Content Include="Views\ActionType\Details.cshtml" />
     <Content Include="Views\ActionType\Edit.cshtml" />
     <Content Include="Views\ActionType\Index.cshtml" />
+    <Content Include="Views\Country\Create.cshtml" />
+    <Content Include="Views\Country\Delete.cshtml" />
+    <Content Include="Views\Country\Details.cshtml" />
+    <Content Include="Views\Country\Edit.cshtml" />
+    <Content Include="Views\Country\Index.cshtml" />
+    <Content Include="Views\Category\Create.cshtml" />
+    <Content Include="Views\Category\Delete.cshtml" />
+    <Content Include="Views\Category\Details.cshtml" />
+    <Content Include="Views\Category\Edit.cshtml" />
+    <Content Include="Views\Category\Index.cshtml" />
+    <Content Include="Views\Condition\Create.cshtml" />
+    <Content Include="Views\Condition\Delete.cshtml" />
+    <Content Include="Views\Condition\Details.cshtml" />
+    <Content Include="Views\Condition\Edit.cshtml" />
+    <Content Include="Views\Condition\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -7,6 +7,8 @@ namespace LibraryManagement.Web.Models
     {
         [Index(IsUnique = true)]
         [StringLength(200)]
+        [Required]
         public string Name { get; set; }
+
     }
 }

@@ -11,6 +11,7 @@ namespace LibraryManagement.Web.Models
 
         [Index(IsUnique = true)]
         [StringLength(100)]
+        [Required]
         public string Name { get; set; }
 
     }
