@@ -46,5 +46,18 @@ namespace LibraryManagement.Web.Models
         public DbSet<Item> Items { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Order> Orders { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            //modelBuilder.Entity().HasIndex(l => new { l.ParentLocationId, l.Name }).IsUnique(true);
+            //// Composite foreign key            
+            /////modelBuilder.Entity()            
+            ///
+            /// //.HasRequired(c => c.Department)            
+            /// //.WithMany(d => d.Courses)            
+            /// //.HasForeignKey(d => new { d.DepartmentID, d.DepartmentName });           
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Conventions.Remove();
+        }
     }
 }
