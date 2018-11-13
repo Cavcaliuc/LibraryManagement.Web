@@ -6,9 +6,11 @@ namespace LibraryManagement.Web.Models
     public class Lookup
     {
         [Key]
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public short Id { get; set; }
 
-        //[Index(IsUnique = true)]
+        [Index(IsUnique = true)]
+        [StringLength(100)]
         public string Name { get; set; }
     }
 }
