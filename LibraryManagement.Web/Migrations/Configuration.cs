@@ -47,106 +47,108 @@
 
 
                 #region Author
+                if (!context.Authors.Any())
+                {
+                    var ionCreaga = new Author { FirstName = "Ion", LastName = "Creangă" };
+                    context.Authors.AddOrUpdate(ionCreaga);
 
-                var ionCreaga = new Author { FirstName = "Ion", LastName = "Creangă" };
-                context.Authors.AddOrUpdate(ionCreaga);
+                    var mirceaEliade = new Author { FirstName = "Mircea", LastName = "Eliade" };
+                    context.Authors.AddOrUpdate(mirceaEliade);
 
-                var mirceaEliade = new Author { FirstName = "Mircea", LastName = "Eliade" };
-                context.Authors.AddOrUpdate(mirceaEliade);
+                    var nicolaeDabija = new Author { FirstName = "Nicolae", LastName = "Dabija" };
+                    context.Authors.AddOrUpdate(nicolaeDabija);
 
-                var nicolaeDabija = new Author { FirstName = "Nicolae", LastName = "Dabija" };
-                context.Authors.AddOrUpdate(nicolaeDabija);
+                    var stephenKing = new Author { FirstName = "Stephen", LastName = "King" };
+                    context.Authors.AddOrUpdate(stephenKing);
 
-                var stephenKing = new Author { FirstName = "Stephen", LastName = "King" };
-                context.Authors.AddOrUpdate(stephenKing);
+                    var agathaChristie = new Author { FirstName = "Agatha", LastName = "Christie" };
+                    context.Authors.AddOrUpdate(agathaChristie);
 
-                var agathaChristie = new Author { FirstName = "Agatha", LastName = "Christie" };
-                context.Authors.AddOrUpdate(agathaChristie);
+                    var danBrown = new Author { FirstName = "Dan", LastName = "Brown" };
+                    context.Authors.AddOrUpdate(danBrown);
 
-                var danBrown = new Author { FirstName = "Dan", LastName = "Brown" };
-                context.Authors.AddOrUpdate(danBrown);
+                    var mihaiEminescu = new Author { FirstName = "Mihai", LastName = "Eminescu" };
+                    context.Authors.AddOrUpdate(mihaiEminescu);
 
-                var mihaiEminescu = new Author { FirstName = "Mihai", LastName = "Eminescu" };
-                context.Authors.AddOrUpdate(mihaiEminescu);
+                    var grigoreVieru = new Author { FirstName = "Grigore", LastName = "Vieru" };
+                    context.Authors.AddOrUpdate(grigoreVieru);
 
-                var grigoreVieru = new Author { FirstName = "Grigore", LastName = "Vieru" };
-                context.Authors.AddOrUpdate(grigoreVieru);
+                    var jkrowling = new Author { FirstName = "Joanne", LastName = "Rowling" };
+                    context.Authors.AddOrUpdate(jkrowling);
 
-                var jkrowling = new Author { FirstName = "Joanne", LastName = "Rowling" };
-                context.Authors.AddOrUpdate(jkrowling);
+                    var esenin = new Author { FirstName = "Serghei", LastName = "Esenin" };
+                    context.Authors.AddOrUpdate(esenin);
 
-                var esenin = new Author { FirstName = "Serghei", LastName = "Esenin" };
-                context.Authors.AddOrUpdate(esenin);
+                    #endregion Author
 
-                #endregion Author
+                    #region Publisher
 
-                #region Publisher
+                    var arc = new Publisher { Name = "ARC" };
+                    context.Publishers.AddOrUpdate(arc);
 
-                var arc = new Publisher { Name = "ARC" };
-                context.Publishers.AddOrUpdate(arc);
+                    var cartier = new Publisher { Name = "Cartier" };
+                    context.Publishers.AddOrUpdate(cartier);
 
-                var cartier = new Publisher { Name = "Cartier" };
-                context.Publishers.AddOrUpdate(cartier);
+                    var humanitas = new Publisher { Name = "Humanitas" };
+                    context.Publishers.AddOrUpdate(humanitas);
 
-                var humanitas = new Publisher { Name = "Humanitas" };
-                context.Publishers.AddOrUpdate(humanitas);
+                    var litera = new Publisher { Name = "Litera" };
+                    context.Publishers.AddOrUpdate(litera);
 
-                var litera = new Publisher { Name = "Litera" };
-                context.Publishers.AddOrUpdate(litera);
+                    var lumina = new Publisher { Name = "Lumina" };
+                    context.Publishers.AddOrUpdate(lumina);
 
-                var lumina = new Publisher { Name = "Lumina" };
-                context.Publishers.AddOrUpdate(lumina);
+                    var polirom = new Publisher { Name = "Polirom" };
+                    context.Publishers.AddOrUpdate(polirom);
 
-                var polirom = new Publisher { Name = "Polirom" };
-                context.Publishers.AddOrUpdate(polirom);
+                    var prInt = new Publisher { Name = "Prut Internațional" };
+                    context.Publishers.AddOrUpdate(prInt);
 
-                var prInt = new Publisher { Name = "Prut Internațional" };
-                context.Publishers.AddOrUpdate(prInt);
+                    var rao = new Publisher { Name = "RAO" };
+                    context.Publishers.AddOrUpdate(rao);
 
-                var rao = new Publisher { Name = "RAO" };
-                context.Publishers.AddOrUpdate(rao);
+                    var teora = new Publisher { Name = "Teora" };
+                    context.Publishers.AddOrUpdate(teora);
 
-                var teora = new Publisher { Name = "Teora" };
-                context.Publishers.AddOrUpdate(teora);
+                    var trei = new Publisher { Name = "Trei" };
+                    context.Publishers.AddOrUpdate(trei);
 
-                var trei = new Publisher { Name = "Trei" };
-                context.Publishers.AddOrUpdate(trei);
+                    #endregion Publisher
 
-                #endregion Publisher
+                    #region Item
 
-                #region Item
+                    var item0 = new Item { Title = "Zece negri mititei", OrdersCount = 1, Category = carte, Publisher = rao, Author = agathaChristie };
+                    context.Items.AddOrUpdate(item0);
 
-                var item0 = new Item { Title = "Zece negri mititei", OrdersCount = 1, Category = carte, Publisher = rao };
-                context.Items.AddOrUpdate(item0);
+                    var item1 = new Item { Title = "Simbolul pierdut", OrdersCount = 1, Category = carte, Publisher = rao, Author = danBrown };
+                    context.Items.AddOrUpdate(item1);
 
-                var item1 = new Item { Title = "Simbolul pierdut", OrdersCount = 1, Category = carte, Publisher = rao };
-                context.Items.AddOrUpdate(item1);
+                    var item2 = new Item { Title = "Amintiri din copilărie", OrdersCount = 1, Category = carte, Publisher = arc, Author = ionCreaga };
+                    context.Items.AddOrUpdate(item2);
 
-                var item2 = new Item { Title = "Amintiri din copilărie", OrdersCount = 1, Category = carte, Publisher = arc };
-                context.Items.AddOrUpdate(item2);
+                    var item3 = new Item { Title = "Poezii", OrdersCount = 1, Category = carte, Publisher = litera, Author = mihaiEminescu };
+                    context.Items.AddOrUpdate(item3);
 
-                var item3 = new Item { Title = "Poezii", OrdersCount = 1, Category = carte, Publisher = litera };
-                context.Items.AddOrUpdate(item3);
+                    var item4 = new Item { Title = "Moarte subită", OrdersCount = 1, Category = carte, Publisher = trei, Author = jkrowling };
+                    context.Items.AddOrUpdate(item4);
 
-                var item4 = new Item { Title = "Moarte subită", OrdersCount = 1, Category = carte, Publisher = trei };
-                context.Items.AddOrUpdate(item4);
+                    var item5 = new Item { Title = "Anotimpuri diferite", OrdersCount = 1, Category = carte, Publisher = trei, Author = stephenKing };
+                    context.Items.AddOrUpdate(item5);
 
-                var item5 = new Item { Title = "Anotimpuri diferite", OrdersCount = 1, Category = carte, Publisher = trei };
-                context.Items.AddOrUpdate(item5);
+                    var item6 = new Item { Title = "Dicționar al religiilor", OrdersCount = 1, Category = carte, Publisher = polirom, Author = mirceaEliade };
+                    context.Items.AddOrUpdate(item6);
 
-                var item6 = new Item { Title = "Dicționar al religiilor", OrdersCount = 1, Category = carte, Publisher = polirom };
-                context.Items.AddOrUpdate(item6);
+                    var item7 = new Item { Title = "Curcubeul", OrdersCount = 1, Category = carte, Publisher = litera, Author = grigoreVieru };
+                    context.Items.AddOrUpdate(item7);
 
-                var item7 = new Item { Title = "Curcubeul", OrdersCount = 1, Category = carte, Publisher = litera };
-                context.Items.AddOrUpdate(item7);
+                    var item8 = new Item { Title = "Poezii - Poems, editie bilingva", OrdersCount = 1, Category = carte, Publisher = teora, Author = mihaiEminescu };
+                    context.Items.AddOrUpdate(item8);
 
-                var item8 = new Item { Title = "Poezii - Poems, editie bilingva", OrdersCount = 1, Category = carte, Publisher = teora };
-                context.Items.AddOrUpdate(item8);
+                    var item9 = new Item { Title = "Moarte printre nori", OrdersCount = 1, Category = carte, Publisher = litera, Author = agathaChristie };
+                    context.Items.AddOrUpdate(item9);
 
-                var item9 = new Item { Title = "Moarte printre nori", OrdersCount = 1, Category = carte, Publisher = litera };
-                context.Items.AddOrUpdate(item9);
-
-                #endregion Item
+                    #endregion Item
+                }
             }
 
             var moldova = context.Countries.FirstOrDefault(x => x.Name == "Moldova");
@@ -509,7 +511,7 @@
                 var todiresti = new Location { Id = 113, Country = moldova, Name = "Todirești", ParentLocation = aneniiNoi };
                 context.Locations.AddOrUpdate(todiresti);
 
-                var troitaNoua = new Location { Id = 114, Country = moldova, Name = "TroițaNouă", ParentLocation = aneniiNoi };
+                var troitaNoua = new Location { Id = 114, Country = moldova, Name = "Troița Nouă", ParentLocation = aneniiNoi };
                 context.Locations.AddOrUpdate(troitaNoua);
 
                 var tintareni = new Location { Id = 115, Country = moldova, Name = "Țînțăreni", ParentLocation = aneniiNoi };
@@ -572,7 +574,7 @@
                 var bulboacaB = new Location { Id = 134, Country = moldova, Name = "Bulboaca", ParentLocation = briceni };
                 context.Locations.AddOrUpdate(bulboacaB);
 
-                var caracuseniiVechi = new Location { Id = 135, Country = moldova, Name = "Caracușeni iVechi", ParentLocation = briceni };
+                var caracuseniiVechi = new Location { Id = 135, Country = moldova, Name = "Caracușenii Vechi", ParentLocation = briceni };
                 context.Locations.AddOrUpdate(caracuseniiVechi);
 
                 var caracuseniiNoi = new Location { Id = 136, Country = moldova, Name = "Caracușenii Noi", ParentLocation = briceni };

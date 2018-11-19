@@ -1,12 +1,26 @@
-﻿namespace LibraryManagement.Web.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LibraryManagement.Web.Models
 {
     public class Stock : Entity
     {
-      public virtual Item Item { get; set; } 
-      public virtual ApplicationUser Owner { get; set; }
-      public virtual ActionType ActionType { get; set; } 
-      public virtual Condition Condition { get; set; }
-      public int Quantity { get; set; }
+        [Required]
+        public long ItemId { get; set; }
 
-    } 
+        public virtual Item Item { get; set; }
+
+        [ScaffoldColumn(false)]
+        public virtual ApplicationUser Owner { get; set; }
+
+        [Required]
+        public short ActionTypeId { get; set; }
+        public virtual ActionType ActionType { get; set; }
+
+        [Required]
+        public short ConditionId { get; set; }
+        public virtual Condition Condition { get; set; }
+
+        [Required]
+        public int Quantity { get; set; }
+    }
 }

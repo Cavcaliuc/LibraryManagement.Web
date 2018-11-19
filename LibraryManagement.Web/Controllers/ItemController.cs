@@ -10,108 +10,122 @@ using LibraryManagement.Web.Models;
 
 namespace LibraryManagement.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
-    public class CountryController : Controller
+    public class ItemController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Country
+        // GET: Item
         public ActionResult Index()
         {
-            return View(db.Countries.ToList());
+            var items = db.Items.Include(i => i.Author).Include(i => i.Category).Include(i => i.Publisher);
+            return View(items.ToList());
         }
 
-        // GET: Country/Details/5
-        public ActionResult Details(short? id)
+        // GET: Item/Details/5
+        public ActionResult Details(long? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Country country = db.Countries.Find(id);
-            if (country == null)
+            Item item = db.Items.Find(id);
+            if (item == null)
             {
                 return HttpNotFound();
             }
-            return View(country);
+            return View(item);
         }
 
-        // GET: Country/Create
+        // GET: Item/Create
         public ActionResult Create()
         {
+            ViewBag.AuthorId = new SelectList(db.Authors, "Id", "FullName");
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name");
+            ViewBag.PublisherId = new SelectList(db.Publishers, "Id", "Name");
             return View();
         }
 
-        // POST: Country/Create
+        // POST: Item/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Name")] Country country)
+        public ActionResult Create([Bind(Include = "Id,Title,OrdersCount,CategoryId,PublisherId,AuthorId,Year")] Item item)
         {
             if (ModelState.IsValid)
             {
-                db.Countries.Add(country);
+                db.Items.Add(item);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            return View(country);
+            GenerateDropdowns(item);
+
+            return View(item);
         }
 
-        // GET: Country/Edit/5
-        public ActionResult Edit(short? id)
+        // GET: Item/Edit/5
+        public ActionResult Edit(long? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Country country = db.Countries.Find(id);
-            if (country == null)
+            Item item = db.Items.Find(id);
+            if (item == null)
             {
                 return HttpNotFound();
             }
-            return View(country);
+            GenerateDropdowns(item);
+            return View(item);
         }
 
-        // POST: Country/Edit/5
+        private void GenerateDropdowns(Item item)
+        {
+            ViewBag.AuthorId = new SelectList(db.Authors.OrderBy(x => x.FirstName).ThenBy(x => x.LastName), "Id", "FullName", item.AuthorId);
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", item.CategoryId);
+            ViewBag.PublisherId = new SelectList(db.Publishers, "Id", "Name", item.PublisherId);
+        }
+
+        // POST: Item/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Name")] Country country)
+        public ActionResult Edit([Bind(Include = "Id,Title,OrdersCount,CategoryId,PublisherId,AuthorId,Year")] Item item)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(country).State = EntityState.Modified;
+                db.Entry(item).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(country);
+            GenerateDropdowns(item);
+            return View(item);
         }
 
-        // GET: Country/Delete/5
-        public ActionResult Delete(short? id)
+        // GET: Item/Delete/5
+        public ActionResult Delete(long? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Country country = db.Countries.Find(id);
-            if (country == null)
+            Item item = db.Items.Find(id);
+            if (item == null)
             {
                 return HttpNotFound();
             }
-            return View(country);
+            return View(item);
         }
 
-        // POST: Country/Delete/5
+        // POST: Item/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(short id)
+        public ActionResult DeleteConfirmed(long id)
         {
-            Country country = db.Countries.Find(id);
-            db.Countries.Remove(country);
+            Item item = db.Items.Find(id);
+            db.Items.Remove(item);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

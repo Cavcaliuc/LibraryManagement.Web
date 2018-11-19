@@ -11,5 +11,10 @@ namespace LibraryManagement.Web.Models
         [Required]
         [Display(Name = "Last name")]
         public string LastName { get; set; }
+
+        public string FullName
+        {
+            get { return $"{FirstName} {LastName}"; }
+        }
     }
 }
