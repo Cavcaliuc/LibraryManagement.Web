@@ -31,12 +31,28 @@
 
 
             #region Genders
-            var male = new Gender { Id = 1, Name = "Male" };
-            var female = new Gender { Id = 2, Name = "Female" };
+            if (!context.Genders.Any())
+            {
+                var male = new Gender { Id = 1, Name = "Male" };
+                var female = new Gender { Id = 2, Name = "Female" };
 
-            context.Genders.AddOrUpdate(male);
-            context.Genders.AddOrUpdate(female);
+                context.Genders.AddOrUpdate(male);
+                context.Genders.AddOrUpdate(female);
+            }
             #endregion Genders
+
+            #region Conditions
+            if (!context.Conditions.Any())
+            {
+                var excellent = new Condition { Id = 1, Name = "New" };
+                var good = new Condition { Id = 2, Name = "Good" };
+                var poor = new Condition { Id = 2, Name = "Poor" };
+
+                context.Conditions.AddOrUpdate(excellent);
+                context.Conditions.AddOrUpdate(good);
+                context.Conditions.AddOrUpdate(poor);
+            }
+            #endregion Conditions
 
             if (!context.Categories.Any())
             {

@@ -210,6 +210,7 @@
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PublisherController.cs" />
+    <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionType.cs" />
     <Compile Include="Models\Author.cs" />
@@ -332,6 +333,11 @@
     <Content Include="Views\Publisher\Details.cshtml" />
     <Content Include="Views\Publisher\Edit.cshtml" />
     <Content Include="Views\Publisher\Index.cshtml" />
+    <Content Include="Views\Stocks\Create.cshtml" />
+    <Content Include="Views\Stocks\Delete.cshtml" />
+    <Content Include="Views\Stocks\Details.cshtml" />
+    <Content Include="Views\Stocks\Edit.cshtml" />
+    <Content Include="Views\Stocks\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
