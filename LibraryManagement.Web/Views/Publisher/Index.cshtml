@@ -1,7 +1,7 @@
-﻿@model PagedList.IPagedList<LibraryManagement.Web.Models.Author>
+﻿@model PagedList.IPagedList<LibraryManagement.Web.Models.Publisher>
 @using PagedList.Mvc;
 @{
-    <h2>Authors</h2>
+    <h2>Publishers</h2>
     <p>
         @Html.ActionLink("Create New", "Create")
     </p>
@@ -19,12 +19,8 @@
         <table class="table table-striped table-condensed table-hover">
             <tr>
                 <th>
-                    @Html.ActionLink("First Name", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.FirstNameSortParam))
-                    @Html.SortIdentifier(currentSort, "firstName")
-                </th>
-                <th>
-                    @Html.ActionLink("Last Name", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.LastNameSortParam))
-                    @Html.SortIdentifier(currentSort, "lastName")
+                    @Html.ActionLink("Name", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.NameSortParam))
+                    @Html.SortIdentifier(currentSort, "Name")
                 </th>
                 <th> Actions </th>
             </tr>
@@ -33,10 +29,7 @@
                 {
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.FirstName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.LastName)
+                            @Html.DisplayFor(modelItem => item.Name)
                         </td>
                         <td>
                             @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |

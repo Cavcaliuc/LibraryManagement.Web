@@ -29,6 +29,15 @@
             context.ActionTypes.AddOrUpdate(actionType3);
             #endregion ActionTypes
 
+
+            #region Genders
+            var male = new Gender { Id = 1, Name = "Male" };
+            var female = new Gender { Id = 2, Name = "Female" };
+
+            context.Genders.AddOrUpdate(male);
+            context.Genders.AddOrUpdate(female);
+            #endregion Genders
+
             if (!context.Categories.Any())
             {
                 var carte = new Category { Name = "Book" };

@@ -14,10 +14,12 @@ namespace LibraryManagement.Web.Models
 
         [Required]
         public short ActionTypeId { get; set; }
+
         public virtual ActionType ActionType { get; set; }
 
         [Required]
         public short ConditionId { get; set; }
+
         public virtual Condition Condition { get; set; }
 
         [Required]
