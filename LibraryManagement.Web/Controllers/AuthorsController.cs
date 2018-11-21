@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using LibraryManagement.Web.Models;
+using PagedList;
 
 namespace LibraryManagement.Web.Controllers
 {
@@ -16,9 +17,36 @@ namespace LibraryManagement.Web.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Authors
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5)
         {
-            return View(db.Authors.ToList());
+            sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "firstName" : sortOrder;
+            page = page > 0 ? page : 1;
+            pageSize = pageSize > 0 ? pageSize : 25;
+
+            ViewBag.searchQuery = String.IsNullOrEmpty(searchString) ? "" : searchString;
+            ViewBag.FirstNameSortParam = sortOrder == "firstName" ? "firstName_desc" : "firstName";
+            ViewBag.LastNameSortParam = sortOrder == "lastName" ? "lastName_desc" : "lastName";
+            ViewBag.CurrentSort = sortOrder;
+
+
+            var query = db.Authors.AsQueryable();
+            query = string.IsNullOrEmpty(searchString) ? query : query.Where(x => x.FirstName.Contains(searchString) || x.LastName.Contains(searchString));
+            switch (sortOrder)
+            {
+                case "firstName":
+                    query = query.OrderBy(x => x.FirstName);
+                    break;
+                case "lastName":
+                    query = query.OrderBy(x => x.LastName);
+                    break;
+                case "firstName_desc":
+                    query = query.OrderByDescending(x => x.FirstName);
+                    break;
+                case "lastName_desc":
+                    query = query.OrderByDescending(x => x.LastName);
+                    break;
+            }
+            return View(query.ToPagedList(page, pageSize));
         }
 
         // GET: Authors/Details/5
