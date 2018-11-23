@@ -17,8 +17,33 @@ namespace LibraryManagement.Web.Controllers
         // GET: Stocks
         public ActionResult Index()
         {
-            var stocks = db.Stocks.Include(s => s.ActionType).Include(s => s.Condition).Include(s => s.Item);
-            return View(stocks.ToList());
+            var stocks = db.Stocks
+                .Include(s => s.ActionType)
+                .Include(s => s.Condition)
+                .Include(s => s.Item);
+            var items = stocks.Select(x =>
+                    new StockModel
+                    {
+                        Id = x.Id,
+                        ItemId = x.Item.Id,
+                        Title = x.Item.Title,
+                        AuthorId = x.Item.Author.Id,
+                        AuthorFirstName = x.Item.Author.FirstName,
+                        AuthorLastName = x.Item.Author.LastName,
+                        PublisherId = x.Item.Publisher.Id,
+                        PublisherName = x.Item.Publisher.Name,
+                        CategoryId = x.Item.Category.Id,
+                        CategoryName = x.Item.Category.Name,
+                        ActionTypeName = x.ActionType.Name,
+                        ActionTypeId = x.ActionType.Id,
+                        ConditionName = x.Condition.Name,
+                        ConditionId = x.Condition.Id,
+                        OwnerId = x.Owner.Id,
+                        OwnerUserName = x.Owner.UserName,
+                        Quantity = x.Quantity,
+                        Year = x.Item.Year
+                    }).ToList();
+            return View(items);
         }
 
         // GET: Stocks/Details/5
@@ -41,7 +66,8 @@ namespace LibraryManagement.Web.Controllers
         {
             ViewBag.ActionTypeId = new SelectList(db.ActionTypes, "Id", "Name");
             ViewBag.ConditionId = new SelectList(db.Conditions, "Id", "Name");
-            ViewBag.ItemId = new SelectList(db.Items, "Id", "Title");
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name");
+            //ViewBag.ItemId = new SelectList(db.Items, "Id", "Title");
             return View();
         }
 
