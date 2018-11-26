@@ -136,6 +136,19 @@ namespace LibraryManagement.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        public JsonResult PublisherExists(string name)
+        {
+            //check if any of the Publisher Name matches the name specified in the Parameter using the ANY extension method.  
+            return Json(!db.Publishers.Any(x => x.Name == name), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetPublishers(string term = "")
+        {
+            var publishers = db.Publishers.Where(x => x.Name.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Name).ToList();
+            return Json(publishers, JsonRequestBehavior.AllowGet);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
