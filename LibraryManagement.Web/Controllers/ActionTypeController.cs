@@ -48,6 +48,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,Name")] ActionType actionType)
         {
+            CheckName(actionType);
             if (ModelState.IsValid)
             {
                 db.ActionTypes.Add(actionType);
@@ -80,6 +81,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name")] ActionType actionType)
         {
+            CheckName(actionType);
             if (ModelState.IsValid)
             {
                 db.Entry(actionType).State = EntityState.Modified;
@@ -113,6 +115,14 @@ namespace LibraryManagement.Web.Controllers
             db.ActionTypes.Remove(actionType);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        private void CheckName(ActionType actionType)
+        {
+            if (db.ActionTypes.Any(x => x.Name.ToUpper() == actionType.Name.ToUpper()))
+            {
+                ModelState.AddModelError("Name", "Action Type already in use");
+            }
         }
 
         protected override void Dispose(bool disposing)

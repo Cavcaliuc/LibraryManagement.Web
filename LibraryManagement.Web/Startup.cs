@@ -33,11 +33,17 @@ namespace LibraryManagement.Web
                 var regularUser = new IdentityRole { Name = "RegularUser" };
                 roleManager.Create(regularUser);
 
+                var Location1 = context.Locations.Find(1);
+
                 //Here we create a Admin super user who will maintain the website                 
                 var user = new ApplicationUser
                 {
                     UserName = "administrator@gmail.com",
                     Email = "administrator@gmail.com",
+                    Location = Location1,
+                    LocationId = Location1.Id,
+                    LocationName = Location1.Name,
+
                 };
 
                 var chkUser = userManager.Create(user, "Admin!234");
@@ -48,10 +54,16 @@ namespace LibraryManagement.Web
                     userManager.AddToRole(user.Id, "Admin");
                 }
 
+                var Location2 = context.Locations.Find(2);
+
                 var user1 = new ApplicationUser
                 {
                     UserName = "user1@gmail.com",
                     Email = "user1@gmail.com",
+                    Location = Location2,
+                    LocationId = Location2.Id,
+                    LocationName = Location2.Name,
+
                 };
 
                 var chkUser1 = userManager.Create(user1, "User1!234");
@@ -60,10 +72,14 @@ namespace LibraryManagement.Web
                     userManager.AddToRole(user1.Id, "RegularUser");
                 }
 
+                var Location80= context.Locations.Find(80);
                 var user2 = new ApplicationUser
                 {
                     UserName = "user2@gmail.com",
                     Email = "user2@gmail.com",
+                    Location = Location80,
+                    LocationId = Location80.Id,
+                    LocationName = Location80.Name,
                 };
 
                 var chkUser2 = userManager.Create(user2, "User2!234");

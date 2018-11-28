@@ -49,6 +49,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,Name")] Country country)
         {
+            CheckName(country);
             if (ModelState.IsValid)
             {
                 db.Countries.Add(country);
@@ -81,6 +82,8 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name")] Country country)
         {
+            CheckName(country);
+
             if (ModelState.IsValid)
             {
                 db.Entry(country).State = EntityState.Modified;
@@ -114,6 +117,14 @@ namespace LibraryManagement.Web.Controllers
             db.Countries.Remove(country);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        private void CheckName(Country country)
+        {
+            if (db.Countries.Any(x => x.Name.ToUpper() == country.Name.ToUpper()))
+            {
+                ModelState.AddModelError("Name", "Country already in use");
+            }
         }
 
         protected override void Dispose(bool disposing)

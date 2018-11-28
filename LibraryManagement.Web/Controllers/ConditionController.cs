@@ -49,6 +49,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,Name")] Condition condition)
         {
+            CheckName(condition);
             if (ModelState.IsValid)
             {
                 db.Conditions.Add(condition);
@@ -81,6 +82,8 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name")] Condition condition)
         {
+            CheckName(condition);
+
             if (ModelState.IsValid)
             {
                 db.Entry(condition).State = EntityState.Modified;
@@ -114,6 +117,15 @@ namespace LibraryManagement.Web.Controllers
             db.Conditions.Remove(condition);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+
+        private void CheckName(Condition condition)
+        {
+            if (db.Conditions.Any(x => x.Name.ToUpper() == condition.Name.ToUpper()))
+            {
+                ModelState.AddModelError("Name", "Condition already in use");
+            }
         }
 
         protected override void Dispose(bool disposing)

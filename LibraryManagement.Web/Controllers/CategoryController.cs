@@ -49,6 +49,8 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,Name")] Category category)
         {
+            CheckName(category);
+
             if (ModelState.IsValid)
             {
                 db.Categories.Add(category);
@@ -81,6 +83,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name")] Category category)
         {
+            CheckName(category);
             if (ModelState.IsValid)
             {
                 db.Entry(category).State = EntityState.Modified;
@@ -114,6 +117,22 @@ namespace LibraryManagement.Web.Controllers
             db.Categories.Remove(category);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public JsonResult CrategoryExists(string name)
+        {
+            //check if any of the Publisher Name matches the name specified in the Parameter using the ANY extension method.  
+            return Json(!db.Categories.Any(x => x.Name == name));
+        }
+
+
+        private void CheckName(Category category)
+        {
+            if (db.Categories.Any(x => x.Name.ToUpper() == category.Name.ToUpper()))
+            {
+                ModelState.AddModelError("Name", "Category already in use");
+            }
         }
 
         protected override void Dispose(bool disposing)

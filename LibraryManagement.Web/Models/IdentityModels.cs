@@ -1,4 +1,6 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -16,6 +18,34 @@ namespace LibraryManagement.Web.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+
+        //public short CountryId { get; set; }
+
+        //public string CountryName { get; set; }
+
+        //public Country Country { get; set; }
+
+        //public long ParentLocationId{ get; set; }
+
+        //[Required]
+        //[Display(Name ="City")]
+        //public string ParentLocationName { get; set; }
+
+        //public Location ParentLocation { get; set; }
+
+        public long LocationId { get; set; }
+
+        [Display(Name ="Location")]
+        public string LocationName { get; set; }
+
+        public Location Location { get; set; }
+
+        [Display(Name = "Date Of Birth")]
+        public DateTime? DateOfBirth { get; set; }
+
+        public byte[] Photo { get; set; }
+
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
