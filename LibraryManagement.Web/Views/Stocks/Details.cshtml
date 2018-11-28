@@ -1,37 +1,69 @@
-﻿@model LibraryManagement.Web.Models.Stock
+﻿@model LibraryManagement.Web.Models.StockModel
 
 @{
     ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+<h2>Stock Details</h2>
 
 <div>
     <h4>Stock</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.ActionType.Name)
+            @Html.DisplayNameFor(model => model.Title)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.ActionType.Name)
+            @Html.DisplayFor(model => model.Title)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Condition.Name)
+            @Html.DisplayNameFor(model => model.CategoryName)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Condition.Name)
+            @Html.DisplayFor(model => model.CategoryName)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Item.Title)
+            @Html.DisplayNameFor(model => model.PublisherName)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Item.Title)
+            @Html.DisplayFor(model => model.PublisherName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AuthorFullName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AuthorFullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Year)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Year)
+        </dd>
+        
+        <dt>
+            @Html.DisplayNameFor(model => model.ActionTypeName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ActionTypeName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ConditionName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ConditionName)
         </dd>
 
         <dt>
@@ -41,10 +73,18 @@
         <dd>
             @Html.DisplayFor(model => model.Quantity)
         </dd>
+        
+        <dt>
+            @Html.DisplayNameFor(model => model.OwnerUserName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OwnerUserName)
+        </dd>
 
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Edit", "Save", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

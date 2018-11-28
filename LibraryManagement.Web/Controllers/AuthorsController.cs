@@ -144,6 +144,19 @@ namespace LibraryManagement.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public JsonResult GetFirstNames(string term = "")
+        {
+            var firstNames = db.Authors.Where(x => x.FirstName.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.FirstName).ToList();
+            return Json(firstNames);
+        }
+
+        public JsonResult GetLastNames(string term = "")
+        {
+            var lastNames = db.Authors.Where(x => x.LastName.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.LastName).ToList();
+            return Json(lastNames);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

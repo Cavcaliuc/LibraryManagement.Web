@@ -130,6 +130,13 @@ namespace LibraryManagement.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public JsonResult GetTitles(string term = "")
+        {
+            var titles = db.Items.Where(x => x.Title.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Title).ToList();
+            return Json(titles);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
