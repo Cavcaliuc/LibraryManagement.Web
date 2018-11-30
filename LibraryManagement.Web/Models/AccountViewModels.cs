@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LibraryManagement.Web.Models
@@ -68,6 +69,37 @@ namespace LibraryManagement.Web.Models
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "User name")]
+        public string UserName { get; set; }
+
+        public long? CountryId { get; set; }
+
+        [Required]
+        [Display(Name = "Country")]
+        public string CountryName { get; set; }
+
+        public long? ParentLocationId { get; set; }
+
+        [Required]
+        [Display(Name = "City")]
+        public string ParentLocationName { get; set; }
+
+        public long? LocationId { get; set; }
+
+        [Display(Name = "Location")]
+        public string LocationName { get; set; }
+
+
+        [Display(Name = "Date Of Birth")]
+        [DataType(DataType.Date)]
+        public DateTime? DateOfBirth { get; set; }
+
+        [DataType(DataType.Upload)]
+        public byte[] Photo { get; set; }
+
+        public byte[] PhotoThumbnail { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]

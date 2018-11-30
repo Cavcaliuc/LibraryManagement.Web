@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Data.Entity;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,6 +14,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using LibraryManagement.Web.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace LibraryManagement.Web.Controllers
 {
@@ -17,12 +23,12 @@ namespace LibraryManagement.Web.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-
+        private ApplicationDbContext _applicationDbContext;
         public AccountController()
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -34,9 +40,9 @@ namespace LibraryManagement.Web.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -51,7 +57,6 @@ namespace LibraryManagement.Web.Controllers
                 _userManager = value;
             }
         }
-
         //
         // GET: /Account/Login
         [AllowAnonymous]
@@ -120,7 +125,7 @@ namespace LibraryManagement.Web.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -147,22 +152,35 @@ namespace LibraryManagement.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase fileUpload)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                _applicationDbContext = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+                var userLocation = GetOrSaveUserLocation(model);
+
+                AddPhotoToViewModel(model, fileUpload);
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    DateOfBirth = model.DateOfBirth,
+                    Location = userLocation,
+                    Photo = model.Photo,
+                    PhotoThumbnail = model.PhotoThumbnail
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                    
+
                     //Assign Role to user Here     
                     await this.UserManager.AddToRoleAsync(user.Id, "RegularUser");
                     return RedirectToAction("Index", "Home");
@@ -174,6 +192,7 @@ namespace LibraryManagement.Web.Controllers
             return View(model);
         }
 
+        
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -405,6 +424,82 @@ namespace LibraryManagement.Web.Controllers
             return View();
         }
 
+        private void AddPhotoToViewModel(RegisterViewModel model, HttpPostedFileBase fileUpload)
+        {
+            if (fileUpload != null && fileUpload.ContentLength > 0)
+            {
+                //attach the uploaded image to the object before saving to Database
+                //model.ImageMimeType = fileUpload.ContentLength;
+                model.Photo = new byte[fileUpload.ContentLength];
+                fileUpload.InputStream.Read(model.Photo, 0, fileUpload.ContentLength);
+
+                //Save image to file
+                var filename = fileUpload.FileName;
+                var filePathOriginal = Server.MapPath("/Content/Uploads/Originals");
+                var filePathThumbnail = Server.MapPath("/Content/Uploads/Thumbnails");
+                string savedFileName = Path.Combine(filePathOriginal, filename);
+                fileUpload.SaveAs(savedFileName);
+
+                //Read image back from file and create thumbnail from it
+                var imageFile = Path.Combine(Server.MapPath("~/Content/Uploads/Originals"), filename);
+                using (var srcImage = Image.FromFile(imageFile))
+                using (var newImage = new Bitmap(100, 100))
+                using (var graphics = Graphics.FromImage(newImage))
+                using (var stream = new MemoryStream())
+                {
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    graphics.DrawImage(srcImage, new Rectangle(0, 0, 100, 100));
+                    newImage.Save(stream, ImageFormat.Png);
+                    var thumbNew = File(stream.ToArray(), "image/png");
+                    model.PhotoThumbnail = thumbNew.FileContents;
+                }
+            }
+        }
+
+        private Location GetOrSaveUserLocation(RegisterViewModel model)
+        {
+            var country = _applicationDbContext.Countries.FirstOrDefault(x => x.Name.ToUpper() == model.CountryName.ToUpper());
+            if (country == null)
+            {
+                country = _applicationDbContext.Countries.Add(new Country { Name = model.CountryName });
+                _applicationDbContext.SaveChanges();
+            }
+
+            var parentLocation = _applicationDbContext.Locations
+                .Where(x => x.Name.ToUpper() == model.ParentLocationName.ToUpper())
+                .Include(y => y.ParentLocation).Include(y => y.Country)
+                .FirstOrDefault(x => x.CountryId == country.Id && !x.ParentLocationId.HasValue);
+
+            if (parentLocation == null)
+            {
+                parentLocation =
+                    _applicationDbContext.Locations.Add(new Location { Name = model.ParentLocationName, Country = country });
+                _applicationDbContext.SaveChanges();
+            }
+
+            var userLocation = parentLocation;
+            if (!string.IsNullOrWhiteSpace(model.LocationName))
+            {
+                var location = _applicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
+                    .Include(y => y.ParentLocation)
+                    .FirstOrDefault(x => x.ParentLocationId.HasValue && x.ParentLocationId.Value == parentLocation.Id);
+
+                if (location == null)
+                {
+                    location = _applicationDbContext.Locations.Add(
+                        new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
+                    _applicationDbContext.SaveChanges();
+                }
+
+                userLocation = location;
+            }
+
+            return userLocation;
+        }
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -419,6 +514,12 @@ namespace LibraryManagement.Web.Controllers
                 {
                     _signInManager.Dispose();
                     _signInManager = null;
+                }
+
+                if (_applicationDbContext != null)
+                {
+                    _applicationDbContext.Dispose();
+                    _applicationDbContext = null;
                 }
             }
 
