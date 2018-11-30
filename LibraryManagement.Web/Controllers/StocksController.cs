@@ -10,6 +10,7 @@ using System.Web.Mvc;
 
 namespace LibraryManagement.Web.Controllers
 {
+    [Authorize]
     public class StocksController : Controller
     {
         protected ApplicationDbContext ApplicationDbContext { get; set; }

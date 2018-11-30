@@ -11,7 +11,7 @@ using PagedList;
 
 namespace LibraryManagement.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class AuthorsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
