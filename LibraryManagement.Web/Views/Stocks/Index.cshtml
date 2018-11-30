@@ -14,6 +14,7 @@
     <form class="form-inline">
         <div class="form-group">
             <input type="text" name="searchString" value="@ViewBag.searchQuery" class="search-text form-control" placeholder="Search..." />
+            <input type="text" name="locationString" value="@ViewBag.locationQuery" class="search-text form-control" placeholder="Location..." />
         </div>
         <button type="submit" class="btn btn-info">Search</button>
     </form>
@@ -40,6 +41,9 @@
                     @Html.DisplayName("Owner")
                 </th>
                 <th>
+                    @Html.DisplayName("Location")
+                </th>
+                <th>
                     @Html.DisplayName("Action Type")
                 </th>
                 <th>
@@ -48,8 +52,10 @@
                 <th>
                     @Html.DisplayName("Quantity")
                 </th>
-
-                <th> @Html.DisplayName("Actions") </th>
+                @if (User.IsInRole("Admin") || User.IsInRole("RegularUser"))
+                {
+                    <th> @Html.DisplayName("Actions") </th>
+                }
             </tr>
             <tbody>
                 @foreach (var item in Model)
@@ -71,6 +77,9 @@
                             @Html.DisplayFor(model => item.OwnerUserName)
                         </td>
                         <td>
+                            @Html.DisplayFor(model => item.LocationFullName)
+                        </td>
+                        <td>
                             @Html.DisplayFor(model => item.ActionTypeName)
                         </td>
                         <td>
@@ -79,25 +88,30 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Quantity)
                         </td>
-                        <td>
-                            @Html.ActionLink("Edit", "Save", new { id = item.Id }) |
-                            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                        </td>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("RegularUser"))
+                        {
+                            <td>
+                                @Html.ActionLink("Edit", "Save", new { id = item.Id }) |
+                                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
         </table>
 
         @if (Model.PageCount > 1)
-            {
+        {
             <div class="pager">
                 @Html.PagedListPager(Model, page => Url.Action("Index", new
-               {
-                   page,
-                   sortOrder = ViewBag.currentSort,
-                   searchString = ViewBag.searchQuery
-               }))
+           {
+               page,
+               sortOrder = ViewBag.currentSort,
+               searchString = ViewBag.searchQuery,
+               locationString = ViewBag.locationQuery
+           }))
                 @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
             </div>
         }

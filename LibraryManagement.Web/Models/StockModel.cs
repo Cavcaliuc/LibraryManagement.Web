@@ -36,6 +36,24 @@ namespace LibraryManagement.Web.Models
         [Display(Name = "Author")]
         public string AuthorFullName => $"{AuthorFirstName} {AuthorLastName}";
 
+        public long? CountryId { get; set; }
+
+        public string CountryName { get; set; }
+
+        public long? ParentLocationId { get; set; }
+
+        public string ParentLocationName { get; set; }
+
+        public long? LocationId { get; set; }
+
+        public string LocationName { get; set; }
+
+        //public string LocationFullName => {CountryName},  {string.IsNullOrWhiteSpace(LocationName)?? ParentLocationName: ParentLocationName, LocationName}";
+
+        public string LocationFullName
+        {
+            get { return string.IsNullOrWhiteSpace(ParentLocationName) ? $"{CountryName}, {LocationName}" : $"{CountryName}, {ParentLocationName}, {LocationName}"; }
+        }
         [Required]
         [Range(1900, 2100, ErrorMessage = "{0} must be between {1} and {2}")]
         public long Year { get; set; }

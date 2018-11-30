@@ -10,7 +10,6 @@ using System.Web.Mvc;
 
 namespace LibraryManagement.Web.Controllers
 {
-    [Authorize]
     public class StocksController : Controller
     {
         protected ApplicationDbContext ApplicationDbContext { get; set; }
@@ -27,13 +26,14 @@ namespace LibraryManagement.Web.Controllers
             this.UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(this.ApplicationDbContext));
         }
 
-        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5)
+        public ActionResult Index(string sortOrder, string searchString, string locationString, int page = 1, int pageSize = 5)
         {
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "title" : sortOrder;
             page = page > 0 ? page : 1;
             pageSize = pageSize > 0 ? pageSize : 25;
 
             ViewBag.searchQuery = String.IsNullOrEmpty(searchString) ? "" : searchString;
+            ViewBag.locationQuery = String.IsNullOrEmpty(locationString) ? "" : locationString;
             ViewBag.TitleSortParam = sortOrder == "title" ? "title_desc" : "title";
             ViewBag.AuthorSortParam = sortOrder == "author" ? "author_desc" : "author";
             ViewBag.PublisherSortParam = sortOrder == "publisher" ? "publisher_desc" : "publisher";
@@ -47,6 +47,10 @@ namespace LibraryManagement.Web.Controllers
                                                                                   x.Item.Publisher.Name.Contains(searchString) ||
                                                                                   x.Item.Author.FirstName.Contains(searchString) ||
                                                                                   x.Item.Author.LastName.Contains(searchString));
+
+            query = string.IsNullOrEmpty(locationString) ? query : query.Where(x => x.Owner.Location.Country.Name.Contains(locationString) ||
+                                                                                  x.Owner.Location.ParentLocationId.HasValue && x.Owner.Location.ParentLocation.Name.Contains(locationString) ||
+                                                                                  x.Owner.Location.Name.Contains(locationString));
             switch (sortOrder)
             {
                 case "title":
@@ -87,6 +91,12 @@ namespace LibraryManagement.Web.Controllers
                 ConditionId = x.Condition.Id,
                 OwnerId = x.Owner.Id,
                 OwnerUserName = x.Owner.UserName,
+                CountryId = x.Owner.Location.Country.Id,
+                CountryName = x.Owner.Location.Country.Name,
+                LocationId = x.Owner.Location.Id,
+                LocationName = x.Owner.Location.Name,
+                ParentLocationId = x.Owner.Location.ParentLocation.Id,
+                ParentLocationName = x.Owner.Location.ParentLocation.Name,
                 Quantity = x.Quantity,
                 Year = x.Item.Year
             });
@@ -110,6 +120,7 @@ namespace LibraryManagement.Web.Controllers
         }
 
         // GET: Stocks/Create
+        [Authorize]
         public ActionResult Save(long? id)
         {
             if (id == null)
@@ -138,6 +149,7 @@ namespace LibraryManagement.Web.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Save(StockModel stock)
         {
             if (ModelState.IsValid)
@@ -183,6 +195,7 @@ namespace LibraryManagement.Web.Controllers
 
 
         // GET: Stocks/Delete/5
+        [Authorize]
         public ActionResult Delete(long? id)
         {
             if (id == null)
@@ -202,6 +215,7 @@ namespace LibraryManagement.Web.Controllers
         // POST: Stocks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(long id)
         {
             Stock stock = ApplicationDbContext.Stocks.Find(id);
