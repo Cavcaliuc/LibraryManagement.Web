@@ -85,4 +85,135 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.0.min.js" type="text/javascript"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js" type="text/javascript"></script>
+    <link href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/themes/blitzer/jquery-ui.css" rel="Stylesheet" type="text/css" />
+
+    <script type="text/javascript">
+    $(function () {
+        $("#CountryName").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("GetCountries", "Account")',
+                        data: "{ 'term': '" + request.term + "'}",
+                        dataType: "json",
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            response($.map(data, function(val, item) {
+                                return {
+                                    label: val.Name,
+                                    value: val.Name,
+                                    Id: val.Id
+                                };
+                            }));
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    $("#CountryId").val(i.item.Id);
+                    $('#ParentLocationName').val('');
+                    $('#ParentLocationId').val('');
+                    $('#LocationName').val('');
+                    $('#LocationId').val('');
+                },
+                minLength: 1
+            }).focus(function () {
+                $(this).autocomplete("search");
+            });
+
+        $('#CountryName').change(function () {
+            var selectedCountry = $("#CountryId").val();
+            var citySelect = $('#ParentLocationId');
+            citySelect.empty();
+            if (selectedCountry != null && selectedCountry !== '') {
+                $("#ParentLocationName").autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '@Url.Action("GetCities", "Account")',
+                            data: "{ 'countryId': '" + selectedCountry + "','term': '" + request.term + "'}",
+                            dataType: "json",
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                response($.map(data, function(val, item) {
+                                    return {
+                                        label: val.Name,
+                                        value: val.Name,
+                                        Id: val.Id
+                                    };
+                                }));
+                            },
+                            error: function (response) {
+                                alert(response.responseText);
+                            },
+                            failure: function (response) {
+                                alert(response.responseText);
+                            }
+                        });
+                    },
+                    select: function (e, i) {
+                        $("#ParentLocationId").val(i.item.Id);
+                        $('#LocationName').val('');
+                        $('#LocationId').val('');
+                    },
+                    minLength: 1
+                }).focus(function () {
+                    $(this).autocomplete("search");
+                });
+            }
+        });
+
+        $('#ParentLocationName').change(function () {
+            var selectedCountry = $("#CountryId").val();
+            var selectedCity = $("#ParentLocationId").val();
+            $('#LocationId').val('');
+            var locationSelect = $('#LocationId');
+            locationSelect.empty();
+            if (selectedCountry != null && selectedCountry !== '' &&
+                selectedCity != null && selectedCity !== '') {
+                $("#LocationName").autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '@Url.Action("GetLocations", "Account")',
+                            data: "{ 'countryId': '" + selectedCountry + "','cityId': '" + selectedCity + "','term': '" + request.term + "'}",
+                            dataType: "json",
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                response($.map(data, function(val, item) {
+                                    return {
+                                        label: val.Name,
+                                        value: val.Name,
+                                        Id: val.Id
+                                    };
+                                }));
+                            },
+                            error: function (response) {
+                                alert(response.responseText);
+                            },
+                            failure: function (response) {
+                                alert(response.responseText);
+                            }
+                        });
+                    },
+                    select: function (e, i) {
+                        $("#LocationId").val(i.item.Id);
+                    },
+                    minLength: 1
+                }).focus(function () {
+                    $(this).autocomplete("search");
+                });
+            }
+        });
+
+
+        });
+    </script>
 }

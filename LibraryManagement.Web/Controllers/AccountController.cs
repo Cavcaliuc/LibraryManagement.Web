@@ -28,10 +28,12 @@ namespace LibraryManagement.Web.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager,
+            ApplicationDbContext applicationDbContext)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            ApplicationDbContext = applicationDbContext;
         }
 
         public ApplicationSignInManager SignInManager
@@ -55,6 +57,18 @@ namespace LibraryManagement.Web.Controllers
             private set
             {
                 _userManager = value;
+            }
+        }
+
+        public ApplicationDbContext ApplicationDbContext
+        {
+            get
+            {
+                return _applicationDbContext ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _applicationDbContext = value;
             }
         }
         //
@@ -156,7 +170,6 @@ namespace LibraryManagement.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _applicationDbContext = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
                 var userLocation = GetOrSaveUserLocation(model);
 
                 AddPhotoToViewModel(model, fileUpload);
@@ -192,7 +205,7 @@ namespace LibraryManagement.Web.Controllers
             return View(model);
         }
 
-        
+
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -424,6 +437,31 @@ namespace LibraryManagement.Web.Controllers
             return View();
         }
 
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult GetCountries(string term = "")
+        {
+            var titles = ApplicationDbContext.Countries.Where(x => x.Name.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Name).ToList();
+            return Json(titles);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult GetCities(long countryId, string term = "")
+        {
+            var titles = ApplicationDbContext.Locations.Where(x => x.CountryId == countryId && !x.ParentLocationId.HasValue && x.Name.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Name).ToList();
+            return Json(titles);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult GetLocations(long countryId, long cityId, string term = "")
+        {
+            var titles = ApplicationDbContext.Locations.Where(x => x.CountryId == countryId && x.ParentLocationId.HasValue && x.ParentLocationId == cityId 
+                                               && x.Name.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Name).ToList();
+            return Json(titles);
+        }
+
         private void AddPhotoToViewModel(RegisterViewModel model, HttpPostedFileBase fileUpload)
         {
             if (fileUpload != null && fileUpload.ContentLength > 0)
@@ -460,14 +498,14 @@ namespace LibraryManagement.Web.Controllers
 
         private Location GetOrSaveUserLocation(RegisterViewModel model)
         {
-            var country = _applicationDbContext.Countries.FirstOrDefault(x => x.Name.ToUpper() == model.CountryName.ToUpper());
+            var country = ApplicationDbContext.Countries.FirstOrDefault(x => x.Name.ToUpper() == model.CountryName.ToUpper());
             if (country == null)
             {
-                country = _applicationDbContext.Countries.Add(new Country { Name = model.CountryName });
-                _applicationDbContext.SaveChanges();
+                country = ApplicationDbContext.Countries.Add(new Country { Name = model.CountryName });
+                ApplicationDbContext.SaveChanges();
             }
 
-            var parentLocation = _applicationDbContext.Locations
+            var parentLocation = ApplicationDbContext.Locations
                 .Where(x => x.Name.ToUpper() == model.ParentLocationName.ToUpper())
                 .Include(y => y.ParentLocation).Include(y => y.Country)
                 .FirstOrDefault(x => x.CountryId == country.Id && !x.ParentLocationId.HasValue);
@@ -475,20 +513,20 @@ namespace LibraryManagement.Web.Controllers
             if (parentLocation == null)
             {
                 parentLocation =
-                    _applicationDbContext.Locations.Add(new Location { Name = model.ParentLocationName, Country = country });
+                    ApplicationDbContext.Locations.Add(new Location { Name = model.ParentLocationName, Country = country });
                 _applicationDbContext.SaveChanges();
             }
 
             var userLocation = parentLocation;
             if (!string.IsNullOrWhiteSpace(model.LocationName))
             {
-                var location = _applicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
+                var location = ApplicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
                     .Include(y => y.ParentLocation)
                     .FirstOrDefault(x => x.ParentLocationId.HasValue && x.ParentLocationId.Value == parentLocation.Id);
 
                 if (location == null)
                 {
-                    location = _applicationDbContext.Locations.Add(
+                    location = ApplicationDbContext.Locations.Add(
                         new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
                     _applicationDbContext.SaveChanges();
                 }
