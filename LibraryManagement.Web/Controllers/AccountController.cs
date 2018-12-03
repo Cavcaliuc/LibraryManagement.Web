@@ -514,7 +514,7 @@ namespace LibraryManagement.Web.Controllers
             {
                 parentLocation =
                     ApplicationDbContext.Locations.Add(new Location { Name = model.ParentLocationName, Country = country });
-                _applicationDbContext.SaveChanges();
+                ApplicationDbContext.SaveChanges();
             }
 
             var userLocation = parentLocation;
@@ -528,7 +528,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     location = ApplicationDbContext.Locations.Add(
                         new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
-                    _applicationDbContext.SaveChanges();
+                    ApplicationDbContext.SaveChanges();
                 }
 
                 userLocation = location;
