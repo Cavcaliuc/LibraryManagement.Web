@@ -7,6 +7,7 @@ namespace LibraryManagement.Web.Models
       public virtual Stock Stock { get; set; } 
       public virtual ApplicationUser CreatedBy { get; set; }
       public virtual DateTime CreatedDate { get; set; }
+      public virtual OrderStatus OrderStatus { get; set; }
       public int Quantity { get; set; }
 
     } 

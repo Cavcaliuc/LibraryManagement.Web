@@ -29,6 +29,15 @@
             context.ActionTypes.AddOrUpdate(actionType3);
             #endregion ActionTypes
 
+            #region  OrderStatuses
+            var open = new OrderStatus { Id = 3, Name = "Open" };
+            var pending = new OrderStatus { Id = 1, Name = "Pending" };
+            var closed = new OrderStatus { Id = 2, Name = "Closed" };
+
+            context.OrderStatuses.AddOrUpdate(open);
+            context.OrderStatuses.AddOrUpdate(pending);
+            context.OrderStatuses.AddOrUpdate(closed);
+            #endregion OrderStatuses
 
             #region Genders
             if (!context.Genders.Any())

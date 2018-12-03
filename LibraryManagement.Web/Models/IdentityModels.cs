@@ -47,7 +47,7 @@ namespace LibraryManagement.Web.Models
         public DbSet<Condition> Conditions { get; set; }
         public DbSet<Gender> Genders { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<Status> Statuses { get; set; }
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
 
         //Entities
 

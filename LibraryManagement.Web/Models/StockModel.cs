@@ -48,8 +48,6 @@ namespace LibraryManagement.Web.Models
 
         public string LocationName { get; set; }
 
-        //public string LocationFullName => {CountryName},  {string.IsNullOrWhiteSpace(LocationName)?? ParentLocationName: ParentLocationName, LocationName}";
-
         public string LocationFullName
         {
             get { return string.IsNullOrWhiteSpace(ParentLocationName) ? $"{CountryName}, {LocationName}" : $"{CountryName}, {ParentLocationName}, {LocationName}"; }

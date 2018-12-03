@@ -196,7 +196,7 @@ namespace LibraryManagement.Web.Controllers
 
                     //Assign Role to user Here     
                     await this.UserManager.AddToRoleAsync(user.Id, "RegularUser");
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Stocks");
                 }
                 AddErrors(result);
             }
@@ -426,7 +426,7 @@ namespace LibraryManagement.Web.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Stocks");
         }
 
         //
@@ -590,7 +590,7 @@ namespace LibraryManagement.Web.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Stocks");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

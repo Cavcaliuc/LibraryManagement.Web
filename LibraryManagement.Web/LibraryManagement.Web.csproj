@@ -214,6 +214,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionType.cs" />
     <Compile Include="Models\Author.cs" />
+    <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\Condition.cs" />
     <Compile Include="Models\Country.cs" />
@@ -229,8 +230,8 @@
     <Compile Include="Models\Lookup.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Publisher.cs" />
-    <Compile Include="Models\Status.cs" />
     <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\OrderModel.cs" />
     <Compile Include="Models\StockModel.cs" />
     <Compile Include="Models\Stock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -338,6 +339,7 @@
     <Content Include="Views\Stocks\Delete.cshtml" />
     <Content Include="Views\Stocks\Details.cshtml" />
     <Content Include="Views\Stocks\Index.cshtml" />
+    <Content Include="Views\Stocks\Order.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
