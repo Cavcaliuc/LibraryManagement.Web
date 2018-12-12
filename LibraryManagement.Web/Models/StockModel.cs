@@ -48,10 +48,9 @@ namespace LibraryManagement.Web.Models
 
         public string LocationName { get; set; }
 
-        public string LocationFullName
-        {
-            get { return string.IsNullOrWhiteSpace(ParentLocationName) ? $"{CountryName}, {LocationName}" : $"{CountryName}, {ParentLocationName}, {LocationName}"; }
-        }
+        [Display(Name = "Location")]
+        public string LocationFullName => string.IsNullOrWhiteSpace(ParentLocationName) ? $"{CountryName}, {LocationName}" : $"{CountryName}, {ParentLocationName}, {LocationName}";
+
         [Required]
         [Range(1900, 2100, ErrorMessage = "{0} must be between {1} and {2}")]
         public long Year { get; set; }

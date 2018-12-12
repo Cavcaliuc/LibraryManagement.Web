@@ -229,43 +229,6 @@ namespace LibraryManagement.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize]
-        public ActionResult Order(long? stockId)
-        {
-            if (stockId == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Stock stock = ApplicationDbContext.Stocks.Find(stockId);
-            if (stock == null)
-            {
-                return HttpNotFound();
-            }
-            var orderModel = MapToOrderModel(stock);
-            return View(orderModel);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public ActionResult Order(OrderModel orderModel)
-        {
-            if (ModelState.IsValid)
-            {
-                var order = new Order
-                {
-                    Stock = ApplicationDbContext.Stocks.Find(orderModel.StockId),
-                    Quantity = orderModel.OrderQuantity,
-                    OrderStatus = ApplicationDbContext.OrderStatuses.FirstOrDefault(x => x.Name == OrderStatus.Pending),
-                };
-                ApplicationDbContext.Orders.Add(order);
-                ApplicationDbContext.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(orderModel);
-        }
-
         private void PopulateDropDowns(StockModel stock)
         {
             ViewBag.ActionTypeId = new SelectList(ApplicationDbContext.ActionTypes, "Id", "Name", stock.ActionTypeId);
@@ -299,33 +262,7 @@ namespace LibraryManagement.Web.Controllers
             };
             return stockModel;
         }
-
-        private static OrderModel MapToOrderModel(Stock stock)
-        {
-            var orderModel = new OrderModel
-            {
-                StockId = stock.Id,
-                ItemId = stock.Item.Id,
-                Title = stock.Item.Title,
-                AuthorId = stock.Item.Author.Id,
-                AuthorFirstName = stock.Item.Author.FirstName,
-                AuthorLastName = stock.Item.Author.LastName,
-                PublisherId = stock.Item.Publisher.Id,
-                PublisherName = stock.Item.Publisher.Name,
-                CategoryId = stock.Item.Category.Id,
-                CategoryName = stock.Item.Category.Name,
-                ActionTypeName = stock.ActionType.Name,
-                ActionTypeId = stock.ActionType.Id,
-                ConditionName = stock.Condition.Name,
-                ConditionId = stock.Condition.Id,
-                OwnerId = stock.Owner.Id,
-                OwnerUserName = stock.Owner.UserName,
-                Quantity = stock.Quantity,
-                Year = stock.Item.Year
-            };
-            return orderModel;
-        }
-
+        
         private Item SaveItem(StockModel stock)
         {
             var item = ApplicationDbContext.Items
@@ -367,7 +304,6 @@ namespace LibraryManagement.Web.Controllers
             }
             return item;
         }
-
 
         protected override void Dispose(bool disposing)
         {

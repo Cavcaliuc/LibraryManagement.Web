@@ -1,0 +1,139 @@
+﻿@model LibraryManagement.Web.Models.OrderModel
+
+@{
+    /**/
+
+    ViewBag.Title = "Order";
+}
+
+
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        <hr />
+        <h4>Stock Details</h4>
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Title)
+                @Html.HiddenFor(model => model.Title)
+                @Html.HiddenFor(model => model.StockId)
+                @Html.HiddenFor(model => model.ItemId)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.CategoryName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.CategoryName)
+                @Html.HiddenFor(model => model.CategoryName)
+                @Html.HiddenFor(model => model.CategoryId)
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.PublisherName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.PublisherName)
+                @Html.HiddenFor(model => model.PublisherName)
+                @Html.HiddenFor(model => model.PublisherId)
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.AuthorFullName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AuthorFullName)
+                @Html.HiddenFor(model => model.AuthorFirstName)
+                @Html.HiddenFor(model => model.AuthorLastName)
+                @Html.HiddenFor(model => model.AuthorId)
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Year)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Year)
+                @Html.HiddenFor(model => model.Year)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ActionTypeName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ActionTypeName)
+                @Html.HiddenFor(model => model.ActionTypeName)
+                @Html.HiddenFor(model => model.ActionTypeId)
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ConditionName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ConditionName)
+                @Html.HiddenFor(model => model.ConditionName)
+                @Html.HiddenFor(model => model.ConditionId)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Quantity)
+
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Quantity)
+                @Html.HiddenFor(model => model.Quantity)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.OwnerUserName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.OwnerUserName)
+                @Html.HiddenFor(model => model.OwnerUserName)
+                @Html.HiddenFor(model => model.OwnerId)
+            </dd>
+
+        </dl>
+
+        <hr />
+
+        <h4>Order Details</h4>
+
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrderQuantity, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.OrderQuantity, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.OrderQuantity, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+<p>
+    @* @Html.ActionLink("Edit", "Save", new { id = Model.Id }) |*@
+    @Html.ActionLink("Back to List", "Index")
+</p>

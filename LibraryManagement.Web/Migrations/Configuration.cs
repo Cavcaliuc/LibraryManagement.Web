@@ -30,13 +30,13 @@
             #endregion ActionTypes
 
             #region  OrderStatuses
-            var open = new OrderStatus { Id = 3, Name = "Open" };
             var pending = new OrderStatus { Id = 1, Name = "Pending" };
             var closed = new OrderStatus { Id = 2, Name = "Closed" };
+            var canceled = new OrderStatus { Id = 3, Name = "Canceled" };
 
-            context.OrderStatuses.AddOrUpdate(open);
             context.OrderStatuses.AddOrUpdate(pending);
             context.OrderStatuses.AddOrUpdate(closed);
+            context.OrderStatuses.AddOrUpdate(canceled);
             #endregion OrderStatuses
 
             #region Genders
