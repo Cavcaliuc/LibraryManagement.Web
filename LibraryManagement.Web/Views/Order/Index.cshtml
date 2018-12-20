@@ -51,7 +51,7 @@
                 {
                     <tr>
                         <td>
-                            <div >
+                            <div>
                                 <dl class="dl-horizontal">
                                     <dt>@Html.DisplayName("Title")</dt>
                                     <dd>@Html.DisplayFor(model => item.Title)</dd>
@@ -64,7 +64,7 @@
 
                                     <dt>@Html.DisplayNameFor(model => item.Year)</dt>
                                     <dd>  @Html.DisplayFor(model => item.Year)</dd>
-                       
+
                                     <dt>
                                         @Html.DisplayNameFor(model => item.OwnerUserName)
                                     </dt>
@@ -81,7 +81,7 @@
                                 </dl>
                             </div>
                         </td>
-                        
+
                         <td>
                             @Html.DisplayFor(modelItem => item.OrderStatusName)
                         </td>
@@ -98,15 +98,22 @@
                             @Html.DisplayFor(modelItem => item.ModifiedByName)
                         </td>
                         <td>
-                            @if (item.OrderStatusName != OrderStatus.Closed && (ViewBag.CurrentUserId == item.OwnerId || ViewBag.CurrentUserId == item.CreatedById))
+                            @if (ViewBag.CurrentUserId == item.OwnerId || ViewBag.CurrentUserId == item.CreatedById)
                             {
-                                @Html.ActionLink("Details", "Details", new { id = item.Id })
+                                @Html.ActionLink("Message", "Details", new { id = item.Id })
                                 @Html.DisplayName(" ")
-                                @Html.ActionLink("Close", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Closed })
-                                ;
-                                @Html.DisplayName(" ")
-                                @Html.ActionLink("Cancel", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Canceled })
-                                ;
+                                if (item.OrderStatusName == OrderStatus.Pending)
+                                {
+                                    @Html.ActionLink("Close", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Closed })
+                                    @Html.DisplayName(" ")
+                                    @Html.ActionLink("Cancel", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Canceled })
+                                    ;
+                                }
+                                if (item.OrderStatusName == OrderStatus.Canceled)
+                                {
+                                    @Html.ActionLink("ReOrder", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Pending })
+                                    ;
+                                }
                             }
                         </td>
                     </tr>
@@ -115,7 +122,7 @@
         </table>
 
         @if (Model.PageCount > 1)
-            {
+        {
             <div class="pager">
                 @Html.PagedListPager(Model, page => Url.Action("Index", new
            {

@@ -32,7 +32,7 @@ namespace LibraryManagement.Web.Controllers
         public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5)
         {
             var currentUserId = User.Identity.GetUserId();
-            sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "title" : sortOrder;
+            sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "createdDate_desc" : sortOrder;
             page = page > 0 ? page : 1;
             pageSize = pageSize > 0 ? pageSize : 25;
 
