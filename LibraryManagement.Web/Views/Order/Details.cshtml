@@ -1,41 +1,167 @@
-﻿@model LibraryManagement.Web.Models.Order
+﻿@model LibraryManagement.Web.Models.OrderModel
 
 @{
-    ViewBag.Title = "Details";
+    /**/
+
+    ViewBag.Title = "Order";
 }
 
-<h2>Details</h2>
+    <div class="form-horizontal">
+        <hr />
+        <h4>Stock Details</h4>
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
 
-<div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedDate)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Title)
+                @Html.HiddenFor(model => model.Title)
+                @Html.HiddenFor(model => model.StockId)
+                @Html.HiddenFor(model => model.ItemId)
+            </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.CategoryName)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.ModifiedDate)
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.CategoryName)
+                @Html.HiddenFor(model => model.CategoryName)
+                @Html.HiddenFor(model => model.CategoryId)
 
-        <dd>
-            @Html.DisplayFor(model => model.ModifiedDate)
-        </dd>
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.PublisherName)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.PublisherName)
+                @Html.HiddenFor(model => model.PublisherName)
+                @Html.HiddenFor(model => model.PublisherId)
 
-    </dl>
-</div>
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.AuthorFullName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AuthorFullName)
+                @Html.HiddenFor(model => model.AuthorFirstName)
+                @Html.HiddenFor(model => model.AuthorLastName)
+                @Html.HiddenFor(model => model.AuthorId)
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Year)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Year)
+                @Html.HiddenFor(model => model.Year)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ActionTypeName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ActionTypeName)
+                @Html.HiddenFor(model => model.ActionTypeName)
+                @Html.HiddenFor(model => model.ActionTypeId)
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ConditionName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ConditionName)
+                @Html.HiddenFor(model => model.ConditionName)
+                @Html.HiddenFor(model => model.ConditionId)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Quantity)
+
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Quantity)
+                @Html.HiddenFor(model => model.Quantity)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.OwnerUserName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.OwnerUserName)
+                @Html.HiddenFor(model => model.OwnerUserName)
+                @Html.HiddenFor(model => model.OwnerId)
+            </dd>
+
+        </dl>
+
+        <div class="form-horizontal">
+            <hr />
+            <h4>Order Details</h4>
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.OrderQuantity)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.OrderQuantity)
+                </dd>
+                
+                <dt>
+                    @Html.DisplayNameFor(model => model.OrderStatusName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.OrderStatusName)
+                </dd>
+                
+                <dt>
+                    @Html.DisplayNameFor(model => model.CreatedDate)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.CreatedDate)
+                </dd>
+                
+                <dt>
+                    @Html.DisplayNameFor(model => model.CreatedByName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.CreatedByName)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.ModifiedDate)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ModifiedDate)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ModifiedByName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ModifiedByName)
+                </dd>
+
+            </dl>
+        </div>  
+    </div>
+}
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")

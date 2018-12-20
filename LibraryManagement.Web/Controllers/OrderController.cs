@@ -131,7 +131,8 @@ namespace LibraryManagement.Web.Controllers
             {
                 return HttpNotFound();
             }
-            return View(order);
+            var orderModel = MapOrderToOrderModel(order);
+            return View(orderModel);
         }
 
         [Authorize]
@@ -262,6 +263,21 @@ namespace LibraryManagement.Web.Controllers
                 Quantity = stock.Quantity,
                 Year = stock.Item.Year
             };
+            return orderModel;
+        }
+
+        private static OrderModel MapOrderToOrderModel(Order order)
+        {
+            var orderModel = MapToOrderModel(order.Stock);
+            orderModel.OrderQuantity = order.Quantity;
+            orderModel.OrderStatusId = order.OrderStatus.Id;
+            orderModel.OrderStatusName = order.OrderStatus.Name;
+            orderModel.CreatedById = order.CreatedBy.Id;
+            orderModel.CreatedByName = order.CreatedBy.UserName;
+            orderModel.CreatedDate = order.CreatedDate;
+            orderModel.ModifiedById = order.ModifiedBy?.Id;
+            orderModel.ModifiedByName = order.ModifiedBy?.UserName;
+            orderModel.ModifiedDate = order.ModifiedDate;
             return orderModel;
         }
 
