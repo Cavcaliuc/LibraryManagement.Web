@@ -24,14 +24,14 @@
                     @Html.SortIdentifier(currentSort, "title")
                 </th>
                 <th>
-                    @Html.ActionLink("Order status", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.OrderStatusSortParam))
+                    @Html.ActionLink("Status", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.OrderStatusSortParam))
                     @Html.SortIdentifier(currentSort, "orderStatus")
                 </th>
                 <th>
                     @Html.DisplayName("Quantity")
                 </th>
                 <th>
-                    @Html.ActionLink("Created date", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.CreatedDateSortParam))
+                    @Html.ActionLink("Order date", "Index", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.CreatedDateSortParam))
                     @Html.SortIdentifier(currentSort, "createdDate")
                 </th>
                 <th>

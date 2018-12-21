@@ -135,6 +135,33 @@ namespace LibraryManagement.Web.Controllers
             return View(orderModel);
         }
 
+        [HttpPost]
+        public ActionResult Message(long? id, string text)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Order order = ApplicationDbContext.Orders.Find(id);
+            if (order == null)
+            {
+                return HttpNotFound();
+            }
+            order.Messages.Add(
+                new Message
+                {
+                    Text = text,
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = UserManager.FindById(User.Identity.GetUserId())
+                });
+
+            ApplicationDbContext.Entry(order).State = EntityState.Modified;
+            ApplicationDbContext.SaveChanges();
+
+            var orderModel = MapOrderToOrderModel(order);
+            return View("Details", orderModel);
+        }
+
         [Authorize]
         public ActionResult Create(long? stockId)
         {
@@ -266,7 +293,7 @@ namespace LibraryManagement.Web.Controllers
             return orderModel;
         }
 
-        private static OrderModel MapOrderToOrderModel(Order order)
+        private OrderModel MapOrderToOrderModel(Order order)
         {
             var orderModel = MapToOrderModel(order.Stock);
             orderModel.OrderQuantity = order.Quantity;
@@ -278,6 +305,15 @@ namespace LibraryManagement.Web.Controllers
             orderModel.ModifiedById = order.ModifiedBy?.Id;
             orderModel.ModifiedByName = order.ModifiedBy?.UserName;
             orderModel.ModifiedDate = order.ModifiedDate;
+
+            var messages = ApplicationDbContext.Messages
+                .Where(x => x.OrderId == order.Id)
+                .OrderByDescending(x => x.CreatedDate).ToList();
+
+            foreach (var message in messages)
+            {
+                orderModel.Messages.Add(message);
+            }
             return orderModel;
         }
 

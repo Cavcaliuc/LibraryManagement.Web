@@ -1130,10 +1130,10 @@
                 var sofranovca = new Location { Id = 308, Country = moldova, Name = "Șofranovca", ParentLocation = cantemir };
                 context.Locations.AddOrUpdate(sofranovca);
 
-                var taracliaP = new Location { Id = 309, Country = moldova, Name = "Taraclia", ParentLocation = cantemir };
+                var taracliaP = new Location { Id = 309, Country = moldova, Name = "Taraclia", ParentLocation = plopi };
                 context.Locations.AddOrUpdate(taracliaP);
 
-                var taracliaS = new Location { Id = 310, Country = moldova, Name = "Taraclia", ParentLocation = cantemir };
+                var taracliaS = new Location { Id = 310, Country = moldova, Name = "Taraclia", ParentLocation = sadic };
                 context.Locations.AddOrUpdate(taracliaS);
 
                 var tartaul = new Location { Id = 311, Country = moldova, Name = "Tartaul", ParentLocation = cantemir };

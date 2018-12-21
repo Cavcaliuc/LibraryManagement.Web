@@ -133,7 +133,7 @@ namespace LibraryManagement.Web.Controllers
         [HttpPost]
         public JsonResult GetTitles(string term = "")
         {
-            var titles = db.Items.Where(x => x.Title.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Title).ToList();
+            var titles = db.Items.Where(x => x.Title.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Title).Distinct().ToList();
             return Json(titles);
         }
 

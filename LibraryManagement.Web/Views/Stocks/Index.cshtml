@@ -5,10 +5,10 @@
 
 
     <h2>Stocks</h2>
-    <p>
-        @Html.ActionLink("Create New", "Save")
-    </p>
-
+    if (User.IsInRole("RegularUser") || User.IsInRole("Admin"))
+    {
+        <p>@Html.ActionLink("Create New", "Save")</p>
+    }
     string currentSort = ViewBag.currentSort;
 
     <form class="form-inline">
