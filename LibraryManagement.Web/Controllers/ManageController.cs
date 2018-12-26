@@ -15,15 +15,17 @@ namespace LibraryManagement.Web.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _applicationDbContext;
 
         public ManageController()
         {
         }
 
-        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ApplicationDbContext applicationDbContext)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            ApplicationDbContext = applicationDbContext;
         }
 
         public ApplicationSignInManager SignInManager
@@ -32,9 +34,9 @@ namespace LibraryManagement.Web.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -47,6 +49,18 @@ namespace LibraryManagement.Web.Controllers
             private set
             {
                 _userManager = value;
+            }
+        }
+
+        public ApplicationDbContext ApplicationDbContext
+        {
+            get
+            {
+                return _applicationDbContext ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _applicationDbContext = value;
             }
         }
 
@@ -64,7 +78,7 @@ namespace LibraryManagement.Web.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
+            var model = new ManageAccountModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
@@ -72,6 +86,24 @@ namespace LibraryManagement.Web.Controllers
                 Logins = await UserManager.GetLoginsAsync(userId),
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
             };
+
+            var user = ApplicationDbContext.Users.Find(userId);
+
+            if (user != null)
+            {
+                model.UserName = user.UserName;
+                model.Email = user.Email;
+                model.Photo = user.Photo;
+                model.PhotoThumbnail = user.PhotoThumbnail;
+                model.DateOfBirth = user.DateOfBirth;
+                model.LocationId = user.Location?.Id;
+                model.LocationName = user.Location?.Name;
+                model.ParentLocationId = user.Location?.ParentLocation?.Id;
+                model.ParentLocationName = user.Location?.ParentLocation?.Name;
+                model.CountryId = user.Location?.Country.Id;
+                model.CountryName = user.Location?.Country.Name;
+            }
+
             return View(model);
         }
 
@@ -329,11 +361,16 @@ namespace LibraryManagement.Web.Controllers
                 _userManager.Dispose();
                 _userManager = null;
             }
+            if (_applicationDbContext != null)
+            {
+                _applicationDbContext.Dispose();
+                _applicationDbContext = null;
+            }
 
             base.Dispose(disposing);
         }
 
-#region Helpers
+        #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
@@ -384,6 +421,6 @@ namespace LibraryManagement.Web.Controllers
             Error
         }
 
-#endregion
+        #endregion
     }
 }

@@ -174,7 +174,7 @@
         @Html.HiddenFor(x => x.Id)
         @Html.Label("Message", new { @class = "control-label col-md-2" })
         <div class="col-md-10">
-            <textarea id="Text" name="Text" rows="2" cols="70" onfocus="if(this.value === 'Enter your text here') this.value='';" onblur="if (this.value === '') this.value = 'Enter your text here';">Enter your text here</textarea>
+            <textarea id="Text" required="required" name="Text" placeholder="Enter your text here" rows="2" cols="70" onfocus="if(this.value !== '') this.value='';"></textarea>
         </div>
     </div>
 
