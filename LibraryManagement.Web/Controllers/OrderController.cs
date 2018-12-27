@@ -151,7 +151,7 @@ namespace LibraryManagement.Web.Controllers
                 new Message
                 {
                     Text = text,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = UserManager.FindById(User.Identity.GetUserId())
                 });
 
@@ -190,7 +190,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     Stock = ApplicationDbContext.Stocks.Find(orderModel.StockId),
                     Quantity = orderModel.OrderQuantity,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedBy = UserManager.FindById(User.Identity.GetUserId()),
                     OrderStatus = ApplicationDbContext.OrderStatuses.FirstOrDefault(x => x.Name == OrderStatus.Pending),
                 };
@@ -215,7 +215,7 @@ namespace LibraryManagement.Web.Controllers
                 return HttpNotFound();
             }
             order.ModifiedBy = UserManager.FindById(User.Identity.GetUserId());
-            order.ModifiedDate = DateTime.Now;
+            order.ModifiedDate = DateTime.UtcNow;
             order.OrderStatus = ApplicationDbContext.OrderStatuses.FirstOrDefault(x => x.Name == orderStatusName);
             ApplicationDbContext.Entry(order).State = EntityState.Modified;
             ApplicationDbContext.SaveChanges();
