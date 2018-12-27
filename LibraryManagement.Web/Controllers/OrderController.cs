@@ -29,7 +29,7 @@ namespace LibraryManagement.Web.Controllers
             this.UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(this.ApplicationDbContext));
         }
         // GET: Order
-        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5)
+        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5, bool showMyOrders = true)
         {
             var currentUserId = User.Identity.GetUserId();
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "createdDate_desc" : sortOrder;
@@ -44,9 +44,22 @@ namespace LibraryManagement.Web.Controllers
             ViewBag.CurrentSort = sortOrder;
             ViewBag.CurrentUserId = currentUserId;
 
-            var query = ApplicationDbContext.Orders.Where(x => x.CreatedBy.Id == currentUserId)
+            var query = ApplicationDbContext.Orders
                 .Include(s => s.Stock)
+                .Include(s => s.Stock.Owner)
                 .Include(s => s.CreatedBy);
+            var query1 = query.ToList();
+            if (showMyOrders)
+            {
+                query = query.Where(x => x.CreatedBy.Id == currentUserId);
+            }
+            else
+            {
+                query = query.Where(x => x.Stock.Owner.Id == currentUserId);
+            }
+
+            var query2 = query.ToList();
+
             query = string.IsNullOrEmpty(searchString) ? query : query.Where(x => x.Stock.Item.Title.Contains(searchString) ||
                                                                                   x.Stock.Item.Publisher.Name.Contains(searchString) ||
                                                                                   x.Stock.Item.Author.FirstName.Contains(searchString) ||
@@ -112,11 +125,24 @@ namespace LibraryManagement.Web.Controllers
             return View(items.ToPagedList(page, pageSize));
         }
 
-        public long PendingOrdersCount()
+        public ActionResult IncomeIndex()
+        {
+            return RedirectToAction("Index", new { showMyOrders = false });
+        }
+
+        public long PendingOrdersCount(bool showMyOrders = true)
         {
             var currentUserId = User.Identity.GetUserId();
-            return ApplicationDbContext.Orders
-                .Where(x => x.CreatedBy.Id == currentUserId && x.OrderStatus.Name == OrderStatus.Pending).LongCount();
+            var query = ApplicationDbContext.Orders.Where(x => x.OrderStatus.Name == OrderStatus.Pending);
+            if (showMyOrders)
+            {
+                query = query.Where(x => x.CreatedBy.Id == currentUserId);
+            }
+            else
+            {
+                query = query.Where(x => x.Stock.Owner.Id == currentUserId);
+            }
+            return query.LongCount();
         }
 
         // GET: Order/Details/5

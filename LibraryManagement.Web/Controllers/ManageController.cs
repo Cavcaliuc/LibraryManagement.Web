@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -87,7 +89,9 @@ namespace LibraryManagement.Web.Controllers
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
             };
 
-            var user = ApplicationDbContext.Users.Find(userId);
+            var user = ApplicationDbContext.Users
+                .Include(s => s.Location)
+                .FirstOrDefault(x => x.Id == userId);
 
             if (user != null)
             {

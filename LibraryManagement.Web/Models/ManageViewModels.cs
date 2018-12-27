@@ -40,6 +40,8 @@ namespace LibraryManagement.Web.Models
         [Display(Name = "Location")]
         public string LocationName { get; set; }
 
+        [Display(Name = "Location")]
+        public string LocationFullName => string.IsNullOrWhiteSpace(ParentLocationName) ? $"{CountryName}, {LocationName}" : $"{CountryName}, {ParentLocationName}, {LocationName}";
 
         [Display(Name = "Date Of Birth")]
         [DataType(DataType.Date)]

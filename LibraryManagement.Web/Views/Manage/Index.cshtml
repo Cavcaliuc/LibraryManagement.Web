@@ -9,7 +9,64 @@
 <div>
     <h4>Change your account settings</h4>
 
-    @Html.EditorForModel()
+
+    <table class="table">
+        <tr>
+            <td>
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.UserName)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.UserName)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Email)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Email)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.DateOfBirth)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.DateOfBirth)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.CountryName)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.CountryName)
+                        @Html.HiddenFor(model => model.CountryId)
+
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.LocationFullName)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.LocationFullName)
+                        @Html.HiddenFor(model => model.LocationId)
+                        @Html.HiddenFor(model => model.ParentLocationId)
+                        <a href='@Url.Action("Manage", "ManageLogins")'>
+                            <img height="25" width="25" src="~/Content/Imgaes/edit.png" />
+                        </a>
+                    </dd>
+                </dl>
+            </td>
+        </tr>
+    </table>
+
+    
+
     <dl class="dl-horizontal">
         <dt>Password:</dt>
         <dd>

@@ -45,7 +45,10 @@
                         <li>@Html.ActionLink("Authors", "Index", "Authors")</li>
                         <li>@Html.ActionLink("Publishers", "Index", "Publisher")</li>
                         <li>
-                            <a href="@Url.Action("Index", "Order")">My Orders (@{ Html.RenderAction("PendingOrdersCount", "Order");})</a>
+                            <a href="@Url.Action("Index", "Order")">My Orders (@{ Html.RenderAction("PendingOrdersCount", "Order", new { showMyOrders = true });})</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("IncomeIndex", "Order")">Incoming Orders (@{ Html.RenderAction("PendingOrdersCount", "Order", new { showMyOrders = false });})</a>
                         </li>
                     }
 
