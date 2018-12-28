@@ -48,7 +48,6 @@ namespace LibraryManagement.Web.Controllers
                 .Include(s => s.Stock)
                 .Include(s => s.Stock.Owner)
                 .Include(s => s.CreatedBy);
-            var query1 = query.ToList();
             if (showMyOrders)
             {
                 query = query.Where(x => x.CreatedBy.Id == currentUserId);
@@ -57,9 +56,6 @@ namespace LibraryManagement.Web.Controllers
             {
                 query = query.Where(x => x.Stock.Owner.Id == currentUserId);
             }
-
-            var query2 = query.ToList();
-
             query = string.IsNullOrEmpty(searchString) ? query : query.Where(x => x.Stock.Item.Title.Contains(searchString) ||
                                                                                   x.Stock.Item.Publisher.Name.Contains(searchString) ||
                                                                                   x.Stock.Item.Author.FirstName.Contains(searchString) ||
@@ -146,8 +142,16 @@ namespace LibraryManagement.Web.Controllers
         }
 
         // GET: Order/Details/5
-        public ActionResult Details(long? id)
+        public ActionResult Details(long? id, string sortOrder, int page = 1)
         {
+
+            sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "createdDate_desc" : sortOrder;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.Id = id;
+            ViewBag.Page = page;
+            ViewBag.CreatedDateSortParam = sortOrder == "createdDate" ? "createdDate_desc" : "createdDate";
+
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -158,12 +162,28 @@ namespace LibraryManagement.Web.Controllers
                 return HttpNotFound();
             }
             var orderModel = MapOrderToOrderModel(order);
+
+            switch (sortOrder)
+            {
+                case "createdDate":
+                    orderModel.Messages = orderModel.Messages.OrderBy(x => x.CreatedDate).ToList();
+                    break;
+                case "createdDate_desc":
+                    orderModel.Messages = orderModel.Messages.OrderByDescending(x => x.CreatedDate).ToList();
+                    break;
+            }
             return View(orderModel);
         }
 
         [HttpPost]
-        public ActionResult Message(long? id, string text)
+        public ActionResult Message(long? id, string text, string sortOrder, int page = 1)
         {
+            sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "createdDate_desc" : sortOrder;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.Id = id;
+            ViewBag.Page = page;
+            ViewBag.CreatedDateSortParam = sortOrder == "createdDate" ? "createdDate_desc" : "createdDate";
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -185,6 +205,15 @@ namespace LibraryManagement.Web.Controllers
             ApplicationDbContext.SaveChanges();
 
             var orderModel = MapOrderToOrderModel(order);
+            switch (sortOrder)
+            {
+                case "createdDate":
+                    orderModel.Messages = orderModel.Messages.OrderBy(x => x.CreatedDate).ToList();
+                    break;
+                case "createdDate_desc":
+                    orderModel.Messages = orderModel.Messages.OrderByDescending(x => x.CreatedDate).ToList();
+                    break;
+            }
             return View("Details", orderModel);
         }
 

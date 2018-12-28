@@ -1,229 +1,245 @@
-﻿@model LibraryManagement.Web.Models.OrderModel
+﻿@using PagedList
+@using PagedList.Mvc
+@model LibraryManagement.Web.Models.OrderModel
 
 @{
     ViewBag.Title = "Order";
-}
+    var messages = @Model.Messages.ToPagedList((int)ViewBag.Page, 10);
+    string currentSort = ViewBag.currentSort;
 
-<div class="form-horizontal">
-    <h4>Order Details</h4>
+    <div class="form-horizontal">
+        <h4>Order Details</h4>
 
-    <table class="table ">
-        <tr>
-            <td>
-                <dl class="dl-horizontal">
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Title)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.Title)
-                        @Html.HiddenFor(model => model.Title)
-                        @Html.HiddenFor(model => model.StockId)
-                        @Html.HiddenFor(model => model.ItemId)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.CategoryName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.CategoryName)
-                        @Html.HiddenFor(model => model.CategoryName)
-                        @Html.HiddenFor(model => model.CategoryId)
-
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.PublisherName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.PublisherName)
-                        @Html.HiddenFor(model => model.PublisherName)
-                        @Html.HiddenFor(model => model.PublisherId)
-
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.AuthorFullName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.AuthorFullName)
-                        @Html.HiddenFor(model => model.AuthorFirstName)
-                        @Html.HiddenFor(model => model.AuthorLastName)
-                        @Html.HiddenFor(model => model.AuthorId)
-
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Year)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.Year)
-                        @Html.HiddenFor(model => model.Year)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ActionTypeName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.ActionTypeName)
-                        @Html.HiddenFor(model => model.ActionTypeName)
-                        @Html.HiddenFor(model => model.ActionTypeId)
-
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ConditionName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.ConditionName)
-                        @Html.HiddenFor(model => model.ConditionName)
-                        @Html.HiddenFor(model => model.ConditionId)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Quantity)
-
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.Quantity)
-                        @Html.HiddenFor(model => model.Quantity)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.OwnerUserName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.OwnerUserName)
-                        @Html.HiddenFor(model => model.OwnerUserName)
-                        @Html.HiddenFor(model => model.OwnerId)
-                    </dd>
-
-                </dl>
-            </td>
-            <td>
-                <dl class="dl-horizontal">
-                    <dt>
-                        @Html.DisplayNameFor(model => model.OrderQuantity)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.OrderQuantity)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.OrderStatusName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.OrderStatusName)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.CreatedDate)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.CreatedDate)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.CreatedByName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.CreatedByName)
-                    </dd>
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ModifiedDate)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.ModifiedDate)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ModifiedByName)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.ModifiedByName)
-                    </dd>
-
-                </dl>
-            </td>
-        </tr>
-    </table>
-
-</div>
-
-@using (Html.BeginForm("Message", "Order", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-    <div class="form-group">
-        @Html.HiddenFor(x => x.Id)
-        @Html.Label("Message", new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            <textarea id="Text" required="required" name="Text" placeholder="Enter your text here" rows="2" cols="70" onfocus="if(this.value !== '') this.value='';"></textarea>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Send" class="btn btn-default" />
-        </div>
-    </div>
-}
-<div class="form-group">
-    <p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-        @Html.ActionLink("Back to List", "Index")
-    </p>
-</div>
-
-@if (Model.Messages.Count > 0)
-{
-    <h4>Messages</h4>
-
-    <div class="table-responsive">
-        <table class="table">
+        <table class="table ">
             <tr>
-                <th>
-                    @Html.DisplayName("User name")
-                </th>
-                <th>
-                    @Html.DisplayName("Date")
-                </th>
-                <th>
-                    @Html.DisplayName("Message")
-                </th>
+                <td>
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Title)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Title)
+                            @Html.HiddenFor(model => model.Title)
+                            @Html.HiddenFor(model => model.StockId)
+                            @Html.HiddenFor(model => model.ItemId)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.CategoryName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.CategoryName)
+                            @Html.HiddenFor(model => model.CategoryName)
+                            @Html.HiddenFor(model => model.CategoryId)
+
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PublisherName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PublisherName)
+                            @Html.HiddenFor(model => model.PublisherName)
+                            @Html.HiddenFor(model => model.PublisherId)
+
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.AuthorFullName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.AuthorFullName)
+                            @Html.HiddenFor(model => model.AuthorFirstName)
+                            @Html.HiddenFor(model => model.AuthorLastName)
+                            @Html.HiddenFor(model => model.AuthorId)
+
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Year)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Year)
+                            @Html.HiddenFor(model => model.Year)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.ActionTypeName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.ActionTypeName)
+                            @Html.HiddenFor(model => model.ActionTypeName)
+                            @Html.HiddenFor(model => model.ActionTypeId)
+
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.ConditionName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.ConditionName)
+                            @Html.HiddenFor(model => model.ConditionName)
+                            @Html.HiddenFor(model => model.ConditionId)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Quantity)
+
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Quantity)
+                            @Html.HiddenFor(model => model.Quantity)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.OwnerUserName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.OwnerUserName)
+                            @Html.HiddenFor(model => model.OwnerUserName)
+                            @Html.HiddenFor(model => model.OwnerId)
+                        </dd>
+
+                    </dl>
+                </td>
+                <td>
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.OrderQuantity)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.OrderQuantity)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.OrderStatusName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.OrderStatusName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.CreatedDate)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.CreatedDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.CreatedByName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.CreatedByName)
+                        </dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.ModifiedDate)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.ModifiedDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.ModifiedByName)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.ModifiedByName)
+                        </dd>
+
+                    </dl>
+                </td>
             </tr>
-            <tbody>
-                @foreach (var item in Model.Messages)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CreatedBy.UserName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CreatedDate)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Text)
-                        </td>
-                    </tr>
-                }
-            </tbody>
         </table>
+
     </div>
+
+    using (Html.BeginForm("Message", "Order", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.HiddenFor(x => x.Id)
+            @Html.Label("Message", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <textarea id="Text" required="required" name="Text" placeholder="Enter your text here" rows="2" cols="70" onfocus="if(this.value !== '') this.value='';"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Send" class="btn btn-default" />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <p>
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+            @Html.ActionLink("Back to List", "Index")
+        </p>
+    </div>
+
+    if (Model.Messages.Count > 0)
+    {
+        <h4>Messages</h4>
+        <div class="table-responsive">
+            <table class="table table-striped table-condensed table-hover">
+                <tr>
+                    <th>
+                        @Html.DisplayName("User name")
+                    </th>
+                    <th>
+                        @Html.ActionLink("Date", "Details", Request.QueryString.ToRouteValueDictionary("sortOrder", (string)ViewBag.CreatedDateSortParam))
+                        @Html.SortIdentifier(currentSort, "createdDate")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Message")
+                    </th>
+                </tr>
+                <tbody>
+                    @foreach (var item in messages)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedBy.UserName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreatedDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Text)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pager">
+                @Html.PagedListPager(messages, page => Url.Action("Details", new
+           {
+               id= ViewBag.Id,
+               page,
+               sortOrder = ViewBag.currentSort, 
+           }))
+                @(messages.PageCount < messages.PageNumber ? 0 : messages.PageNumber) of @messages.PageCount
+            </div>
+
+        </div>
+    }
+
 }

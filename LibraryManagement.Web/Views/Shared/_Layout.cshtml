@@ -50,6 +50,9 @@
                         <li>
                             <a href="@Url.Action("IncomeIndex", "Order")">Incoming Orders (@{ Html.RenderAction("PendingOrdersCount", "Order", new { showMyOrders = false });})</a>
                         </li>
+                        <li>
+                            <a href="@Url.Action("Index", "Message")">Messages (@{ Html.RenderAction("UnseenMessagesCount", "Message");})</a>
+                        </li>
                     }
 
                 </ul>

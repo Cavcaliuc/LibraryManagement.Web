@@ -42,6 +42,6 @@ namespace LibraryManagement.Web.Models
         [Display(Name = "Status")]
         public string OrderStatusName { get; set; }
 
-        public IList<Message> Messages { get; private set; }
+        public IList<Message> Messages { get; set; }
     }
 }
