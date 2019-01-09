@@ -28,7 +28,7 @@
                 </th>
                 <th> @Html.DisplayName("User name") </th>
                 <th> @Html.DisplayName("Text") </th>
-
+                <th> @Html.DisplayName("Seen") </th>
                 @if (User.IsInRole("RegularUser"))
                 {
                     <th> @Html.DisplayName("Actions") </th>
@@ -38,28 +38,31 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Order.Stock.Item.Title)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CreatedDate)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CreatedBy.UserName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Text)
-                        </td>
-                        <td>
-                            @if (!item.Seen && item.CreatedBy.Id != ViewBag.CurrentUserId)
-                            {
-                                @Html.ActionLink("Mark as Seen", "MarkAsSeen", new { id = item.Id })
-                                @Html.DisplayName(" ")
-                            }
-                            @Html.ActionLink("Order Details", "Details", "Order", new { id = item.Order.Id }, null)
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Order.Stock.Item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedBy.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Text)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Seen)
+                    </td>
+                    <td>
+                        @if (!item.Seen && item.CreatedBy.Id != ViewBag.CurrentUserId)
+                        {
+                            @Html.ActionLink("Mark as Seen", "MarkAsSeen", new { id = item.Id })
+                            @Html.DisplayName(" ")
+                        }
+                        @Html.ActionLink("Order Details", "Details", "Order", new { id = item.Order.Id }, null)
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

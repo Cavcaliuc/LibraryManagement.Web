@@ -43,7 +43,8 @@ namespace LibraryManagement.Web.Controllers
             var query = ApplicationDbContext.Stocks
                 .Include(s => s.ActionType)
                 .Include(s => s.Condition)
-                .Include(s => s.Item);
+                .Include(s => s.Item)
+                .Where(x => x.Quantity > 0);
             query = string.IsNullOrEmpty(searchString) ? query : query.Where(x => x.Item.Title.Contains(searchString) ||
                                                                                   x.Item.Publisher.Name.Contains(searchString) ||
                                                                                   x.Item.Author.FirstName.Contains(searchString) ||
@@ -262,7 +263,7 @@ namespace LibraryManagement.Web.Controllers
             };
             return stockModel;
         }
-        
+
         private Item SaveItem(StockModel stock)
         {
             var item = ApplicationDbContext.Items
