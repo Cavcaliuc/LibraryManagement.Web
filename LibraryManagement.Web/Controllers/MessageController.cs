@@ -12,6 +12,8 @@ using PagedList;
 
 namespace LibraryManagement.Web.Controllers
 {
+
+    [Authorize(Roles = "RegularUser")]
     public class MessageController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

@@ -21,7 +21,6 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Stocks")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
 
@@ -29,21 +28,22 @@
                     {
 
                         <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin Pages</a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin Panel</a>
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("Action types", "Index", "ActionType")</li>
                                 <li>@Html.ActionLink("Countries", "Index", "Country")</li>
                                 <li>@Html.ActionLink("Categories", "Index", "Category")</li>
                                 <li>@Html.ActionLink("Conditions", "Index", "Condition")</li>
                                 <li>@Html.ActionLink("Items", "Index", "Item")</li>
+                                <li>@Html.ActionLink("Authors", "Index", "Authors")</li>
+                                <li>@Html.ActionLink("Publishers", "Index", "Publisher")</li>
                             </ul>
                         </li>
 
                     }
-                    @if (User.IsInRole("Admin") || User.IsInRole("RegularUser"))
+                   
+                    @if (User.IsInRole("RegularUser"))
                     {
-                        <li>@Html.ActionLink("Authors", "Index", "Authors")</li>
-                        <li>@Html.ActionLink("Publishers", "Index", "Publisher")</li>
                         <li>
                             <a href="@Url.Action("Index", "Order")">My Orders (@{ Html.RenderAction("PendingOrdersCount", "Order", new { showMyOrders = true });})</a>
                         </li>

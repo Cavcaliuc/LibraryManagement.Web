@@ -13,6 +13,7 @@ using PagedList;
 
 namespace LibraryManagement.Web.Controllers
 {
+    [Authorize(Roles = "RegularUser")]
     public class OrderController : Controller
     {
         protected ApplicationDbContext ApplicationDbContext { get; set; }

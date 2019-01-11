@@ -10,6 +10,7 @@ using LibraryManagement.Web.Models;
 
 namespace LibraryManagement.Web.Controllers
 {
+    [Authorize]
     public class ItemController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

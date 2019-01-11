@@ -11,6 +11,7 @@ using PagedList;
 
 namespace LibraryManagement.Web.Controllers
 {
+    [Authorize]
     public class PublisherController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -143,6 +144,7 @@ namespace LibraryManagement.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public JsonResult GetPublishers(string term = "")
         {
             var publishers = db.Publishers.Where(x => x.Name.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Name).ToList();
