@@ -5,7 +5,7 @@
 
 
     <h2>Stocks</h2>
-    if ((string)ViewBag.CurrentUserId != string.Empty)
+    if (ViewBag.CurrentUserId != null)
     {
         <p>@Html.ActionLink("Create New", "Save")</p>
     }
@@ -98,7 +98,7 @@
                                 @Html.ActionLink("Delete", "Delete", new { id = item.Id });
                             }
 
-                            @if ((string)ViewBag.CurrentUserId!= string.Empty && ViewBag.CurrentUserId != item.OwnerId)
+                            @if (ViewBag.CurrentUserId != null && ViewBag.CurrentUserId != item.OwnerId)
                             {
                                 @Html.ActionLink("Order", "Create", "Order", new { stockId = item.Id }, new { @class = "btn btn-info" })
 
