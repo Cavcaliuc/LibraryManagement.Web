@@ -5,7 +5,7 @@
 
 
     <h2>Stocks</h2>
-    if (User.IsInRole("RegularUser") || User.IsInRole("Admin"))
+    if ((string)ViewBag.CurrentUserId != string.Empty)
     {
         <p>@Html.ActionLink("Create New", "Save")</p>
     }
@@ -52,7 +52,7 @@
                 <th>
                     @Html.DisplayName("Quantity")
                 </th>
-                @if (User.IsInRole("Admin") || User.IsInRole("RegularUser"))
+                @if ((string)ViewBag.CurrentUserId != string.Empty)
                 {
                     <th> @Html.DisplayName("Actions") </th>
                 }
@@ -98,7 +98,7 @@
                                 @Html.ActionLink("Delete", "Delete", new { id = item.Id });
                             }
 
-                            @if (User.IsInRole("RegularUser") && ViewBag.CurrentUserId != item.OwnerId)
+                            @if ((string)ViewBag.CurrentUserId!= string.Empty && ViewBag.CurrentUserId != item.OwnerId)
                             {
                                 @Html.ActionLink("Order", "Create", "Order", new { stockId = item.Id }, new { @class = "btn btn-info" })
 
