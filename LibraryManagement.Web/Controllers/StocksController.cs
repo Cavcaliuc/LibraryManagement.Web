@@ -26,7 +26,7 @@ namespace LibraryManagement.Web.Controllers
             this.UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(this.ApplicationDbContext));
         }
 
-        public ActionResult Index(string sortOrder, string searchString, string locationString, int page = 1, int pageSize = 5)
+        public ActionResult Index(string sortOrder, string searchString, string locationString, int page = 1, int pageSize = 10)
         {
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "title" : sortOrder;
             page = page > 0 ? page : 1;

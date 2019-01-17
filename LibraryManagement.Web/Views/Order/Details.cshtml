@@ -189,7 +189,7 @@
     }
     <div class="form-group">
         <p>
-            @Html.ActionLink("Back to List", "Index")
+            @Html.ActionLink("Back to Messages", "Index", "Message")
         </p>
     </div>
 
@@ -233,7 +233,7 @@
            {
                id= ViewBag.Id,
                page,
-               sortOrder = ViewBag.currentSort, 
+               sortOrder = ViewBag.currentSort,
            }))
                 @(messages.PageCount < messages.PageNumber ? 0 : messages.PageNumber) of @messages.PageCount
             </div>

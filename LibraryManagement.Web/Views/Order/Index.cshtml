@@ -103,14 +103,14 @@
                                 @Html.DisplayName(" ")
                                 if (item.OrderStatusName == OrderStatus.Pending)
                                 {
-                                    @Html.ActionLink("Close", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Closed })
+                                    @Html.ActionLink("Close", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Closed, showMyOrders = (bool)ViewBag.ShowMyOrders })
                                     @Html.DisplayName(" ")
-                                    @Html.ActionLink("Cancel", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Canceled })
+                                    @Html.ActionLink("Cancel", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Canceled, showMyOrders = (bool)ViewBag.ShowMyOrders })
                                     ;
                                 }
                                 if (item.OrderStatusName == OrderStatus.Canceled)
                                 {
-                                    @Html.ActionLink("ReOrder", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Pending })
+                                    @Html.ActionLink("ReOrder", "UpdateStatus", new { id = item.Id, orderStatusName = OrderStatus.Pending, showMyOrders = (bool)ViewBag.ShowMyOrders })
                                     ;
                                 }
                             }

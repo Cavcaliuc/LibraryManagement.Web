@@ -17,7 +17,7 @@ namespace LibraryManagement.Web.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Authors
-        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5)
+        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 10)
         {
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "firstName" : sortOrder;
             page = page > 0 ? page : 1;

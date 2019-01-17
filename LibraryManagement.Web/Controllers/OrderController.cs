@@ -30,7 +30,7 @@ namespace LibraryManagement.Web.Controllers
             this.UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(this.ApplicationDbContext));
         }
         // GET: Order
-        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 5, bool showMyOrders = true)
+        public ActionResult Index(string sortOrder, string searchString, int page = 1, int pageSize = 10, bool showMyOrders = true)
         {
             var currentUserId = User.Identity.GetUserId();
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "createdDate_desc" : sortOrder;
@@ -44,6 +44,7 @@ namespace LibraryManagement.Web.Controllers
             ViewBag.CreatedDateSortParam = sortOrder == "createdDate" ? "createdDate_desc" : "createdDate";
             ViewBag.CurrentSort = sortOrder;
             ViewBag.CurrentUserId = currentUserId;
+            ViewBag.ShowMyOrders = showMyOrders;
 
             var query = ApplicationDbContext.Orders
                 .Include(s => s.Stock)
@@ -262,7 +263,7 @@ namespace LibraryManagement.Web.Controllers
         }
 
         // GET: Order/Edit/5
-        public ActionResult UpdateStatus(long? id, string orderStatusName)
+        public ActionResult UpdateStatus(long? id, string orderStatusName, bool showMyOrders = true)
         {
             if (id == null)
             {
@@ -281,7 +282,7 @@ namespace LibraryManagement.Web.Controllers
 
             UpdateStockQuantity(order);
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { showMyOrders });
         }
 
         // POST: Order/Edit/5
