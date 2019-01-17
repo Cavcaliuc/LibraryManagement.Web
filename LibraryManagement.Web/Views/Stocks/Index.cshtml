@@ -52,7 +52,7 @@
                 <th>
                     @Html.DisplayName("Quantity")
                 </th>
-                @if ((string)ViewBag.CurrentUserId != string.Empty)
+                @if (ViewBag.CurrentUserId != null)
                 {
                     <th> @Html.DisplayName("Actions") </th>
                 }

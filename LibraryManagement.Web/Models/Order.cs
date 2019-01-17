@@ -18,6 +18,6 @@ namespace LibraryManagement.Web.Models
         public virtual OrderStatus OrderStatus { get; set; }
         public int Quantity { get; set; }
 
-        public ICollection<Message> Messages { get; private set; }
+        public ICollection<Message> Messages { get; set; }
     }
 }

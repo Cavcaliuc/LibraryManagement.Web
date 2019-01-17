@@ -152,16 +152,17 @@ namespace LibraryManagement.Web.Controllers
             ViewBag.Page = page;
             ViewBag.CreatedDateSortParam = sortOrder == "createdDate" ? "createdDate_desc" : "createdDate";
 
-
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             Order order = ApplicationDbContext.Orders.Find(id);
             if (order == null)
             {
                 return HttpNotFound();
             }
+
             var orderModel = MapOrderToOrderModel(order);
 
             switch (sortOrder)
@@ -173,6 +174,8 @@ namespace LibraryManagement.Web.Controllers
                     orderModel.Messages = orderModel.Messages.OrderByDescending(x => x.CreatedDate).ToList();
                     break;
             }
+
+            UpdateUnSeenMessages(page, orderModel);
             return View(orderModel);
         }
 
@@ -393,6 +396,23 @@ namespace LibraryManagement.Web.Controllers
             stock.Quantity = stock.Quantity - order.Quantity;
             ApplicationDbContext.Entry(stock).State = EntityState.Modified;
             ApplicationDbContext.SaveChanges();
+        }
+
+        private void UpdateUnSeenMessages(int page, OrderModel orderModel)
+        {
+            var pageSize = 10;
+            var currentUserId = User.Identity.GetUserId();
+
+            var unseenMessagesToUpdate = orderModel.Messages.Skip(page > 1 ? (page - 1) * pageSize : 0).Take(pageSize);
+            foreach (var message in unseenMessagesToUpdate)
+            {
+                if (message.CreatedBy.Id != currentUserId && !message.Seen)
+                {
+                    message.Seen = true;
+                    ApplicationDbContext.Entry(message).State = EntityState.Modified;
+                    ApplicationDbContext.SaveChanges();
+                }
+            }
         }
 
         protected override void Dispose(bool disposing)

@@ -33,8 +33,14 @@ namespace LibraryManagement.Web.Controllers
             ViewBag.CurrentSort = sortOrder;
             ViewBag.CurrentUserId = currentUserId;
 
-            var query = db.Messages.Include(m => m.Order).Include(m => m.Order.Stock)
-                .Where(x => (x.CreatedBy.Id == currentUserId || x.Order.Stock.Owner.Id == currentUserId || x.Order.CreatedBy.Id == currentUserId));
+            var query = db.Orders.Include(m => m.Messages).Include(m => m.Stock)
+                .Select(m => m.Messages
+                            .OrderByDescending(y => y.CreatedDate)
+                            .FirstOrDefault(x => x.CreatedBy.Id == currentUserId ||
+                                                  x.Order.Stock.Owner.Id == currentUserId ||
+                                                  x.Order.CreatedBy.Id == currentUserId))
+                .Where(x => x != null);
+
 
             query = string.IsNullOrEmpty(searchString) ? query : query.Where(x => x.Order.Stock.Item.Title.Contains(searchString) ||
                                                                                   x.CreatedBy.UserName.Contains(searchString));
