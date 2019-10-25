@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace LibraryManagement.Web.Models
 {
@@ -31,6 +32,7 @@ namespace LibraryManagement.Web.Models
         public virtual Author Author { get; set; }
 
         [Required]
+        [Range(1000, 2019)]
         public long Year { get; set; }
 
     }

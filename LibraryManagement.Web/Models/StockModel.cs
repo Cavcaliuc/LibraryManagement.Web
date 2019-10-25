@@ -52,7 +52,7 @@ namespace LibraryManagement.Web.Models
         public string LocationFullName => string.IsNullOrWhiteSpace(ParentLocationName) ? $"{CountryName}, {LocationName}" : $"{CountryName}, {ParentLocationName}, {LocationName}";
 
         [Required]
-        [Range(1900, 2100, ErrorMessage = "{0} must be between {1} and {2}")]
+        [Range(1000, 2100, ErrorMessage = "{0} must be between {1} and {2}")]
         public long Year { get; set; }
 
         [Display(Name = "Owner")]
@@ -75,7 +75,7 @@ namespace LibraryManagement.Web.Models
         public string ConditionName { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Only positive number allowed")]
+        [Range(1, 1000, ErrorMessage = "Only positive number allowed")]
         public int Quantity { get; set; }
     }
 }
