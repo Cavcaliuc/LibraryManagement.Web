@@ -91,25 +91,39 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View(model);
             }
-
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
+            // Require the user to have a confirmed email before they can log on.
+            var user = await UserManager.FindByEmailAsync(model.Email);
+            if (user != null)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-            }
-        }
+                if (!await UserManager.IsEmailConfirmedAsync(user.Id))
+                {
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirm your account-Resend");
 
+                    ViewBag.errorMessage = "You must have a confirmed email to log on.";
+                    return View("Error");
+                }
+                var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: true);
+                switch (result)
+                {
+                    case SignInStatus.Success:
+                        return RedirectToLocal(returnUrl);
+                    case SignInStatus.LockedOut:
+                        return View("Lockout");
+                    case SignInStatus.RequiresVerification:
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    case SignInStatus.Failure:
+                    default:
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+
+        }
         //
         // GET: /Account/VerifyCode
         [AllowAnonymous]
@@ -188,15 +202,15 @@ namespace LibraryManagement.Web.Controllers
                 {
                     //Assign Role to user Here     
                     await UserManager.AddToRoleAsync(user.Id, "RegularUser");
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     //For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     //Send an email with this link
-                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirm your account");
 
-                    return RedirectToAction("Index", "Stocks");
+                    ViewBag.Message = "Check your email and confirm your account, you must be confirmed "
+                         + "before you can log in.";
+
+                    return View("Info");
                 }
                 AddErrors(result);
             }
@@ -236,7 +250,7 @@ namespace LibraryManagement.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
+                var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -245,10 +259,10 @@ namespace LibraryManagement.Web.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form
@@ -282,7 +296,7 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByNameAsync(model.Email);
+            var user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist
@@ -457,7 +471,7 @@ namespace LibraryManagement.Web.Controllers
         [AllowAnonymous]
         public JsonResult GetLocations(long countryId, long cityId, string term = "")
         {
-            var titles = ApplicationDbContext.Locations.Where(x => x.CountryId == countryId && x.ParentLocationId.HasValue && x.ParentLocationId == cityId 
+            var titles = ApplicationDbContext.Locations.Where(x => x.CountryId == countryId && x.ParentLocationId.HasValue && x.ParentLocationId == cityId
                                                && x.Name.ToUpper().Contains(term.ToUpper())).OrderBy(x => x.Name).ToList();
             return Json(titles);
         }
@@ -537,6 +551,16 @@ namespace LibraryManagement.Web.Controllers
             return userLocation;
         }
 
+        private async Task<string> SendEmailConfirmationTokenAsync(string userID, string subject)
+        {
+            string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account",
+               new { userId = userID, code = code }, protocol: Request.Url.Scheme);
+            await UserManager.SendEmailAsync(userID, subject,
+               "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+            return callbackUrl;
+        }
 
         protected override void Dispose(bool disposing)
         {
