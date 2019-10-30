@@ -11,7 +11,9 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using LibraryManagement.Web.Models;
-
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 namespace LibraryManagement.Web
 {
     public class EmailService : IIdentityMessageService
@@ -23,12 +25,43 @@ namespace LibraryManagement.Web
         }
     }
 
+    public interface ITwilioMessageSender
+    {
+        Task SendMessageAsync(string to, string from, string body);
+    }
+    public class TwilioMessageSender : ITwilioMessageSender
+    {
+        public TwilioMessageSender()
+        {
+            var accountsid = System.Configuration.ConfigurationManager.AppSettings["TWILIOSID"];
+            var authToken = System.Configuration.ConfigurationManager.AppSettings["TWILIOTOKEN"];
+            TwilioClient.Init(accountsid, authToken);
+        }
+
+        public async Task SendMessageAsync(string to, string from, string body)
+        {
+            await MessageResource.CreateAsync(new PhoneNumber(to),
+                                              from: new PhoneNumber(from),
+                                              body: body);
+        }
+    }
+
     public class SmsService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        private readonly ITwilioMessageSender _messageSender;
+
+        public SmsService() : this(new TwilioMessageSender()) { }
+
+        public SmsService(ITwilioMessageSender messageSender)
         {
-            // Plug in your SMS service here to send a text message.
-            return Task.FromResult(0);
+            _messageSender = messageSender;
+        }
+
+        public async Task SendAsync(IdentityMessage message)
+        {
+            await _messageSender.SendMessageAsync(message.Destination,
+                                                  System.Configuration.ConfigurationManager.AppSettings["TWILIONUMBER"],
+                                                  message.Body);
         }
     }
 
@@ -40,7 +73,7 @@ namespace LibraryManagement.Web
         {
         }
 
-        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
+        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<ApplicationDbContext>()));
             // Configure validation logic for usernames
@@ -81,7 +114,7 @@ namespace LibraryManagement.Web
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
+                manager.UserTokenProvider =
                     new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
             return manager;
