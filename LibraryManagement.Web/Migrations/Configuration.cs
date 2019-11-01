@@ -112,6 +112,7 @@
 
                     var esenin = new Author { FirstName = "Serghei", LastName = "Esenin" };
                     context.Authors.AddOrUpdate(esenin);
+                    context.SaveChanges();
 
                     #endregion Author
 
@@ -146,6 +147,7 @@
 
                     var trei = new Publisher { Name = "Trei" };
                     context.Publishers.AddOrUpdate(trei);
+                    context.SaveChanges();
 
                     #endregion Publisher
 
@@ -180,6 +182,7 @@
 
                     var item9 = new Item { Title = "Moarte printre nori", OrdersCount = 1, Category = carte, Publisher = litera, Author = agathaChristie };
                     context.Items.AddOrUpdate(item9);
+                    context.SaveChanges();
 
                     #endregion Item
                 }
