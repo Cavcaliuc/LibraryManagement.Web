@@ -15,6 +15,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using LibraryManagement.Web.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Text.RegularExpressions;
 
 namespace LibraryManagement.Web.Controllers
 {
@@ -82,17 +83,25 @@ namespace LibraryManagement.Web.Controllers
 
         //
         // POST: /Account/Login
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+          
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            // Require the user to have a confirmed email before they can log on.
-            var user = await UserManager.FindByEmailAsync(model.Email);
+            ApplicationUser user;
+            var isEmailValid = IsValidEmail(model.EmailOrUserName);
+            if (isEmailValid)
+                // Require the user to have a confirmed email before they can log on.
+                user = await UserManager.FindByEmailAsync(model.EmailOrUserName);
+            else
+                user = await UserManager.FindByNameAsync(model.EmailOrUserName);
+
             if (user != null)
             {
                 if (!await UserManager.IsEmailConfirmedAsync(user.Id))
@@ -588,6 +597,7 @@ namespace LibraryManagement.Web.Controllers
             base.Dispose(disposing);
         }
 
+
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
@@ -644,6 +654,11 @@ namespace LibraryManagement.Web.Controllers
                 }
                 context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
             }
+        }
+        bool IsValidEmail(string strIn)
+        {
+            // Return true if strIn is in valid e-mail format.
+            return Regex.IsMatch(strIn, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
         }
         #endregion
     }

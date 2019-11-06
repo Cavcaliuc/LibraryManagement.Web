@@ -59,8 +59,8 @@ namespace LibraryManagement.Web.Models
         public string Password { get; set; }
 
         [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Display(Name = "Email/UserName")]
+        public string EmailOrUserName { get; set; }
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }

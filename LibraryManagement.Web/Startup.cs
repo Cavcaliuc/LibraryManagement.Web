@@ -41,6 +41,7 @@ namespace LibraryManagement.Web
                     UserName = "administrator@gmail.com",
                     Email = "administrator@gmail.com",
                     Location = Location1,
+                    EmailConfirmed = true
                 };
 
                 var chkUser = userManager.Create(user, "Admin!234");
@@ -58,6 +59,7 @@ namespace LibraryManagement.Web
                     UserName = "user1@gmail.com",
                     Email = "user1@gmail.com",
                     Location = Location2,
+                    EmailConfirmed = true
                 };
 
                 var chkUser1 = userManager.Create(user1, "User1!234");
@@ -66,12 +68,13 @@ namespace LibraryManagement.Web
                     userManager.AddToRole(user1.Id, "RegularUser");
                 }
 
-                var Location80= context.Locations.Find(80);
+                var Location80 = context.Locations.Find(80);
                 var user2 = new ApplicationUser
                 {
                     UserName = "user2@gmail.com",
                     Email = "user2@gmail.com",
                     Location = Location80,
+                    EmailConfirmed = true
                 };
 
                 var chkUser2 = userManager.Create(user2, "User2!234");
