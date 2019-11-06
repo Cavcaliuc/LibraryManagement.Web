@@ -64,15 +64,17 @@ namespace LibraryManagement.Web.Controllers
 
             foreach (var message in pagedList)
             {
-                message.Text = Encryption.Decrypt(message.Text);
-
                 if (message.CreatedBy.Id != currentUserId && !message.Seen)
                 {
                     message.Seen = true;
                     db.Entry(message).State = EntityState.Modified;
-                    db.SaveChanges();
-
                 }
+            }
+            db.SaveChanges();
+
+            foreach (var message in pagedList)
+            {
+                message.Text = Encryption.Decrypt(message.Text);
             }
 
             return View(pagedList);

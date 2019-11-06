@@ -372,7 +372,7 @@ namespace LibraryManagement.Web.Controllers
 
             foreach (var message in messages)
             {
-                message.Text = Encryption.Decrypt(message.Text);
+               message.Text = Encryption.Decrypt(message.Text);
                 orderModel.Messages.Add(message);
             }
             return orderModel;
@@ -412,8 +412,14 @@ namespace LibraryManagement.Web.Controllers
                 {
                     message.Seen = true;
                     ApplicationDbContext.Entry(message).State = EntityState.Modified;
-                    ApplicationDbContext.SaveChanges();
                 }
+                message.Text = Encryption.Encrypt(message.Text);
+            }
+            ApplicationDbContext.SaveChanges();
+
+            foreach (var message in unseenMessagesToUpdate)
+            {
+                message.Text = Encryption.Decrypt(message.Text);
             }
         }
 
