@@ -244,6 +244,7 @@
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\PublisherController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
+    <Compile Include="Encryption.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionType.cs" />
     <Compile Include="Models\Author.cs" />

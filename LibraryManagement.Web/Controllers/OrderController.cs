@@ -201,7 +201,7 @@ namespace LibraryManagement.Web.Controllers
             order.Messages.Add(
                 new Message
                 {
-                    Text = text,
+                    Text = Encryption.Encrypt(text),
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = UserManager.FindById(User.Identity.GetUserId())
                 });
@@ -372,6 +372,7 @@ namespace LibraryManagement.Web.Controllers
 
             foreach (var message in messages)
             {
+                message.Text = Encryption.Decrypt(message.Text);
                 orderModel.Messages.Add(message);
             }
             return orderModel;

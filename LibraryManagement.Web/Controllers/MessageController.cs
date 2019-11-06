@@ -64,6 +64,8 @@ namespace LibraryManagement.Web.Controllers
 
             foreach (var message in pagedList)
             {
+                message.Text = Encryption.Decrypt(message.Text);
+
                 if (message.CreatedBy.Id != currentUserId && !message.Seen)
                 {
                     message.Seen = true;
