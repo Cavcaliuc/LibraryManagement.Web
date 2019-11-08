@@ -60,14 +60,29 @@ namespace LibraryManagement.Web.Controllers
                     query = query.OrderByDescending(x => x.CreatedDate);
                     break;
             }
-            var pagedList = query.ToPagedList(page, pageSize);
-
-            foreach (var message in pagedList)
+            var pagedList = query.Select(x => new MessageModel
             {
-                if (message.CreatedBy.Id != currentUserId && !message.Seen)
+                UserName = x.CreatedBy.UserName,
+                CreatedById = x.CreatedBy.Id,
+                Id = x.Id,
+                ItemTitle = x.Order.Stock.Item.Title,
+                OrderId = x.OrderId,
+                CreatedDate = x.CreatedDate,
+                Seen = x.Seen,
+                Text = x.Text
+            }).ToPagedList(page, pageSize);
+
+            foreach (var messageModel in pagedList)
+            {
+                if (messageModel.CreatedById != currentUserId && !messageModel.Seen)
                 {
-                    message.Seen = true;
-                    db.Entry(message).State = EntityState.Modified;
+                    var message = db.Messages.FirstOrDefault(x => x.Id == messageModel.Id);
+                    if (message != null)
+                    {
+                        message.Seen = true;
+                        messageModel.Seen = true;
+                        db.Entry(message).State = EntityState.Modified;
+                    }
                 }
             }
             db.SaveChanges();

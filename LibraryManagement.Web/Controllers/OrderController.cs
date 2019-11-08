@@ -366,15 +366,24 @@ namespace LibraryManagement.Web.Controllers
             orderModel.ModifiedByName = order.ModifiedBy?.UserName;
             orderModel.ModifiedDate = order.ModifiedDate;
 
-            var messages = ApplicationDbContext.Messages
+            orderModel.Messages = ApplicationDbContext.Messages
                 .Where(x => x.OrderId == order.Id)
-                .OrderByDescending(x => x.CreatedDate).ToList();
+                .OrderByDescending(x => x.CreatedDate)
+                .Select(x => new MessageModel
+                {
+                    UserName = x.CreatedBy.UserName,
+                    CreatedById = x.CreatedBy.Id,
+                    Id = x.Id,
+                    ItemTitle = x.Order.Stock.Item.Title,
+                    OrderId = x.OrderId,
+                    CreatedDate = x.CreatedDate,
+                    Seen = x.Seen,
+                    Text = x.Text
+                })
+                .ToList();
 
-            foreach (var message in messages)
-            {
-               message.Text = Encryption.Decrypt(message.Text);
-                orderModel.Messages.Add(message);
-            }
+            orderModel.Messages.ForEach(x => x.Text = Encryption.Decrypt(x.Text));
+
             return orderModel;
         }
 
@@ -406,21 +415,21 @@ namespace LibraryManagement.Web.Controllers
             var currentUserId = User.Identity.GetUserId();
 
             var unseenMessagesToUpdate = orderModel.Messages.Skip(page > 1 ? (page - 1) * pageSize : 0).Take(pageSize);
-            foreach (var message in unseenMessagesToUpdate)
+            foreach (var messageModel in unseenMessagesToUpdate)
             {
-                if (message.CreatedBy.Id != currentUserId && !message.Seen)
+                if (messageModel.CreatedById != currentUserId && !messageModel.Seen)
                 {
-                    message.Seen = true;
-                    ApplicationDbContext.Entry(message).State = EntityState.Modified;
+                    var message = ApplicationDbContext.Messages.FirstOrDefault(x => x.Id == messageModel.Id);
+                    if (message != null)
+                    {
+                        messageModel.Seen = true;
+                        message.Seen = true;
+                        ApplicationDbContext.Entry(message).State = EntityState.Modified;
+                    }
                 }
-                message.Text = Encryption.Encrypt(message.Text);
             }
             ApplicationDbContext.SaveChanges();
 
-            foreach (var message in unseenMessagesToUpdate)
-            {
-                message.Text = Encryption.Decrypt(message.Text);
-            }
         }
 
         protected override void Dispose(bool disposing)
