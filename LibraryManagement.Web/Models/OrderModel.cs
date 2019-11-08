@@ -8,7 +8,7 @@ namespace LibraryManagement.Web.Models
     {
         public OrderModel()
         {
-            this.Messages = new List<Message>();
+            this.Messages = new List<MessageModel>();
         }
 
         public long OrderId { get; set; }
@@ -42,6 +42,6 @@ namespace LibraryManagement.Web.Models
         [Display(Name = "Status")]
         public string OrderStatusName { get; set; }
 
-        public IList<Message> Messages { get; set; }
+        public List<MessageModel> Messages { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿@using LibraryManagement.Web.Models
 @using PagedList.Mvc
-@model PagedList.IPagedList<Message>
+@model PagedList.IPagedList<MessageModel>
 @{
     ViewBag.Title = "Index";
 
@@ -40,13 +40,13 @@
                 {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Order.Stock.Item.Title)
+                        @Html.DisplayFor(modelItem => item.ItemTitle)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.CreatedDate)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.CreatedBy.UserName)
+                        @Html.DisplayFor(modelItem => item.UserName)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Text)
@@ -55,12 +55,12 @@
                         @Html.DisplayFor(modelItem => item.Seen)
                     </td>
                     <td>
-                        @if (!item.Seen && item.CreatedBy.Id != ViewBag.CurrentUserId)
+                        @if (!item.Seen && item.CreatedById != ViewBag.CurrentUserId)
                         {
                             @Html.ActionLink("Mark as Seen", "MarkAsSeen", new { id = item.Id })
                             @Html.DisplayName(" ")
                         }
-                        @Html.ActionLink("Order Details", "Details", "Order", new { id = item.Order.Id }, null)
+                        @Html.ActionLink("Order Details", "Details", "Order", new { id = item.OrderId }, null)
                     </td>
                 </tr>
                 }

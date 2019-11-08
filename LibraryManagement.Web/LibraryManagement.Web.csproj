@@ -251,6 +251,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionType.cs" />
     <Compile Include="Models\Author.cs" />
+    <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Category.cs" />
