@@ -80,10 +80,12 @@ namespace LibraryManagement.Web.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+
+            var phoneNumber = await UserManager.GetPhoneNumberAsync(userId);
             var model = new ManageAccountModel
             {
                 HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
+                PhoneNumber = !string.IsNullOrWhiteSpace(phoneNumber) ? Encryption.Decrypt(phoneNumber) : phoneNumber,
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
@@ -215,12 +217,16 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View(model);
             }
+
             var result = await UserManager.ChangePhoneNumberAsync(User.Identity.GetUserId(), model.PhoneNumber, model.Code);
             if (result.Succeeded)
             {
                 var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 if (user != null)
                 {
+                    user.PhoneNumber = Encryption.Encrypt(model.PhoneNumber);
+                    ApplicationDbContext.Entry(user).State = EntityState.Modified;
+                    ApplicationDbContext.SaveChanges();
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 }
                 return RedirectToAction("Index", new { Message = ManageMessageId.AddPhoneSuccess });

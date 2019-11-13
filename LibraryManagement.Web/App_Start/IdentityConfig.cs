@@ -13,6 +13,7 @@ using Twilio.Types;
 using SendGrid.Helpers.Mail;
 using System.Diagnostics;
 using SendGrid;
+using LibraryManagement.Web;
 
 namespace LibraryManagement.Web
 {
@@ -64,7 +65,8 @@ public class TwilioMessageSender : ITwilioMessageSender
 
     public async Task SendMessageAsync(string to, string from, string body)
     {
-        await MessageResource.CreateAsync(new PhoneNumber(to),
+        var toPhoneNumber = !string.IsNullOrWhiteSpace(to) ? Encryption.Decrypt(to) : to;
+        await MessageResource.CreateAsync(new PhoneNumber(toPhoneNumber),
                                           from: new PhoneNumber(from),
                                           body: body);
     }
@@ -110,7 +112,7 @@ public class ApplicationUserManager : UserManager<ApplicationUser>
         // Configure validation logic for passwords
         manager.PasswordValidator = new PasswordValidator
         {
-            RequiredLength = 6,
+            RequiredLength = 8,
             RequireNonLetterOrDigit = true,
             RequireDigit = true,
             RequireLowercase = true,
