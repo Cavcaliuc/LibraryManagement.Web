@@ -98,7 +98,7 @@ namespace LibraryManagement.Web.Controllers
             if (user != null)
             {
                 model.UserName = user.UserName;
-                model.Email = user.Email;
+                model.Email = Encryption.Decrypt(user.Email);
                 model.Photo = user.Photo;
                 model.PhotoThumbnail = user.PhotoThumbnail;
                 model.DateOfBirth = user.DateOfBirth;
@@ -174,11 +174,11 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EnableTwoFactorAuthentication()
         {
-            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), true);
-            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            var userId = User.Identity.GetUserId();
+            var user = await UserManager.FindByIdAsync(userId);
             if (user != null)
             {
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                await EnableTwoFactor(user, true);
             }
             return RedirectToAction("Index", "Manage");
         }
@@ -189,15 +189,16 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DisableTwoFactorAuthentication()
         {
-            await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), false);
+            //await UserManager.SetTwoFactorEnabledAsync(User.Identity.GetUserId(), false);
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             if (user != null)
             {
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                await EnableTwoFactor(user, false);
             }
             return RedirectToAction("Index", "Manage");
         }
 
+        
         //
         // GET: /Manage/VerifyPhoneNumber
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
@@ -272,12 +273,16 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View(model);
             }
+
+            UpdateUserEmail(User.Identity.GetUserId(),false);
             var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
             if (result.Succeeded)
             {
                 var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 if (user != null)
                 {
+                    UpdateUserEmail(User.Identity.GetUserId());
+
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 }
                 return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
@@ -362,6 +367,25 @@ namespace LibraryManagement.Web.Controllers
             }
             var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
+        }
+
+        private void UpdateUserEmail(string userId, bool toEncrypt = true)
+        {
+            var savedUser = ApplicationDbContext.Users.FirstOrDefault(x => x.Id == userId);
+            if (savedUser == null) return;
+
+            savedUser.Email = toEncrypt ? Encryption.Encrypt(savedUser.Email) : Encryption.Decrypt(savedUser.Email);
+
+            ApplicationDbContext.Entry(savedUser).State = EntityState.Modified;
+            ApplicationDbContext.SaveChanges();
+        }
+
+        private async Task EnableTwoFactor(ApplicationUser user, bool enableTwoFactor)
+        {
+            user.TwoFactorEnabled = enableTwoFactor;
+            ApplicationDbContext.Entry(user).State = EntityState.Modified;
+            ApplicationDbContext.SaveChanges();
+            await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
         }
 
         protected override void Dispose(bool disposing)

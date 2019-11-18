@@ -39,7 +39,7 @@ namespace LibraryManagement.Web
                 var user = new ApplicationUser
                 {
                     UserName = "administrator@gmail.com",
-                    Email = "administrator@gmail.com",
+                    Email = Encryption.Encrypt("administrator@gmail.com"),
                     Location = Location1,
                     EmailConfirmed = true
                 };
@@ -57,7 +57,7 @@ namespace LibraryManagement.Web
                 var user1 = new ApplicationUser
                 {
                     UserName = "user1@gmail.com",
-                    Email = "user1@gmail.com",
+                    Email = Encryption.Encrypt("user1@gmail.com"),
                     Location = Location2,
                     EmailConfirmed = true
                 };
@@ -72,7 +72,7 @@ namespace LibraryManagement.Web
                 var user2 = new ApplicationUser
                 {
                     UserName = "user2@gmail.com",
-                    Email = "user2@gmail.com",
+                    Email = Encryption.Encrypt("user2@gmail.com"),
                     Location = Location80,
                     EmailConfirmed = true
                 };
