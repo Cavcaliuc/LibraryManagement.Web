@@ -11,6 +11,7 @@ namespace LibraryManagement.Web
     {
         public static string Encrypt(string textData)
         {
+           if( string.IsNullOrWhiteSpace(textData)) return textData;
             var Encryptionkey = System.Configuration.ConfigurationManager.AppSettings["Encryptionkey"];
             RijndaelManaged objrij = new RijndaelManaged();
             //set the mode for operation of the algorithm
@@ -39,15 +40,16 @@ namespace LibraryManagement.Web
             //Final transform the test string.
             return Convert.ToBase64String(objtransform.TransformFinalBlock(textDataByte, 0, textDataByte.Length));
         }
-        public static string Decrypt(string EncryptedText)
+        public static string Decrypt(string encryptedText)
         {
+            if (string.IsNullOrWhiteSpace(encryptedText)) return encryptedText;
             var Encryptionkey = System.Configuration.ConfigurationManager.AppSettings["Encryptionkey"];
             RijndaelManaged objrij = new RijndaelManaged();
             objrij.Mode = CipherMode.CBC;
             objrij.Padding = PaddingMode.PKCS7;
             objrij.KeySize = 0x80;
             objrij.BlockSize = 0x80;
-            byte[] encryptedTextByte = Convert.FromBase64String(EncryptedText);
+            byte[] encryptedTextByte = Convert.FromBase64String(encryptedText);
             byte[] passBytes = Encoding.UTF8.GetBytes(Encryptionkey);
             byte[] EncryptionkeyBytes = new byte[0x10];
             int len = passBytes.Length;

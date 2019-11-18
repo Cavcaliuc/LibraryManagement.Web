@@ -89,7 +89,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-          
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -97,8 +97,10 @@ namespace LibraryManagement.Web.Controllers
             ApplicationUser user;
             var isEmailValid = IsValidEmail(model.EmailOrUserName);
             if (isEmailValid)
+            {
                 // Require the user to have a confirmed email before they can log on.
-                user = await UserManager.FindByEmailAsync(model.EmailOrUserName);
+                user = await UserManager.FindByEmailAsync(Encryption.Encrypt(model.EmailOrUserName));
+            }
             else
                 user = await UserManager.FindByNameAsync(model.EmailOrUserName);
 
@@ -166,7 +168,12 @@ namespace LibraryManagement.Web.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
+                    {
+                        var userId = await SignInManager.GetVerifiedUserIdAsync();
+                        UpdateUserEmail(userId);
+                        return RedirectToLocal(model.ReturnUrl);
+                    }
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.Failure:
@@ -239,9 +246,15 @@ namespace LibraryManagement.Web.Controllers
                 return View("Error");
             }
             var result = await UserManager.ConfirmEmailAsync(userId, code);
+
+            if (result.Succeeded)
+            {
+                UpdateUserEmail(userId);
+            }
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
+        
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
@@ -259,18 +272,21 @@ namespace LibraryManagement.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByEmailAsync(model.Email);
+                var user = await UserManager.FindByEmailAsync(Encryption.Encrypt(model.Email));
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
                 }
 
+                UpdateUserEmail(user.Id, false);
                 // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                 await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                UpdateUserEmail(user.Id);
+
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
@@ -305,15 +321,18 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByEmailAsync(model.Email);
+            var user = await UserManager.FindByEmailAsync(Encryption.Encrypt((model.Email)));
             if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
+            UpdateUserEmail(user.Id, false);
+
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
+                UpdateUserEmail(user.Id);
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
             AddErrors(result);
@@ -349,6 +368,8 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View("Error");
             }
+            UpdateUserEmail(userId, false);
+
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
             var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
@@ -424,7 +445,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = Encryption.Encrypt(model.Email) };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -569,6 +590,17 @@ namespace LibraryManagement.Web.Controllers
                "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
             return callbackUrl;
+        }
+
+        private void UpdateUserEmail(string userId, bool toEncrypt = true)
+        {
+            var savedUser = ApplicationDbContext.Users.FirstOrDefault(x => x.Id == userId);
+            if (savedUser == null) return;
+
+            savedUser.Email = toEncrypt ? Encryption.Encrypt(savedUser.Email) : Encryption.Decrypt(savedUser.Email);
+
+            ApplicationDbContext.Entry(savedUser).State = EntityState.Modified;
+            ApplicationDbContext.SaveChanges();
         }
 
         protected override void Dispose(bool disposing)
