@@ -208,7 +208,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     UserName = model.UserName,
                     Email = model.Email,
-                    DateOfBirth = model.DateOfBirth,
+                    DateOfBirth = Encryption.Encrypt(model.DateOfBirth.ToString()),
                     Location = userLocation,
                     Photo = model.Photo,
                     PhotoThumbnail = model.PhotoThumbnail

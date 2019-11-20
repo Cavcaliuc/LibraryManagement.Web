@@ -21,7 +21,7 @@ namespace LibraryManagement.Web.Models
 
         public Location Location { get; set; }
 
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
 
         public byte[] Photo { get; set; }
 

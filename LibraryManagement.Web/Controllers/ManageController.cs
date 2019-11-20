@@ -101,7 +101,7 @@ namespace LibraryManagement.Web.Controllers
                 model.Email = Encryption.Decrypt(user.Email);
                 model.Photo = user.Photo;
                 model.PhotoThumbnail = user.PhotoThumbnail;
-                model.DateOfBirth = user.DateOfBirth;
+                model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
                 model.LocationId = user.Location?.Id;
                 model.LocationName = user.Location?.Name;
                 model.ParentLocationId = user.Location?.ParentLocation?.Id;
@@ -165,7 +165,7 @@ namespace LibraryManagement.Web.Controllers
                 };
                 await UserManager.SmsService.SendAsync(message);
             }
-            return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model.Number });
+            return RedirectToAction("VerifyPhoneNumber", new VerifyPhoneNumberViewModel { PhoneNumber = model.Number });
         }
 
         //
@@ -198,7 +198,7 @@ namespace LibraryManagement.Web.Controllers
             return RedirectToAction("Index", "Manage");
         }
 
-        
+
         //
         // GET: /Manage/VerifyPhoneNumber
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
@@ -219,13 +219,17 @@ namespace LibraryManagement.Web.Controllers
                 return View(model);
             }
 
-            var result = await UserManager.ChangePhoneNumberAsync(User.Identity.GetUserId(), model.PhoneNumber, model.Code);
+            var userId = User.Identity.GetUserId();
+            UpdateUserEmail(userId, false);
+            var result = await UserManager.ChangePhoneNumberAsync(userId, model.PhoneNumber, model.Code);
             if (result.Succeeded)
             {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                var user = await UserManager.FindByIdAsync(userId);
                 if (user != null)
                 {
                     user.PhoneNumber = Encryption.Encrypt(model.PhoneNumber);
+                    user.Email = Encryption.Encrypt(user.Email);
+                   
                     ApplicationDbContext.Entry(user).State = EntityState.Modified;
                     ApplicationDbContext.SaveChanges();
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -274,7 +278,7 @@ namespace LibraryManagement.Web.Controllers
                 return View(model);
             }
 
-            UpdateUserEmail(User.Identity.GetUserId(),false);
+            UpdateUserEmail(User.Identity.GetUserId(), false);
             var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
             if (result.Succeeded)
             {

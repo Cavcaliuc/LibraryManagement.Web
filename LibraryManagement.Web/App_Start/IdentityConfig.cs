@@ -65,8 +65,8 @@ public class TwilioMessageSender : ITwilioMessageSender
 
     public async Task SendMessageAsync(string to, string from, string body)
     {
-        var toPhoneNumber = !string.IsNullOrWhiteSpace(to) ? Encryption.Decrypt(to) : to;
-        await MessageResource.CreateAsync(new PhoneNumber(toPhoneNumber),
+        //var toPhoneNumber = !string.IsNullOrWhiteSpace(to) ? Encryption.Decrypt(to) : to;
+        await MessageResource.CreateAsync(new PhoneNumber(to),
                                           from: new PhoneNumber(from),
                                           body: body);
     }

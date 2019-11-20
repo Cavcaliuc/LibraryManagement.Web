@@ -248,6 +248,10 @@
     <Compile Include="Controllers\PublisherController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Encryption.cs" />
+    <Compile Include="Migrations\201911201316320_update_dateofbirth_data_type_to_string.cs" />
+    <Compile Include="Migrations\201911201316320_update_dateofbirth_data_type_to_string.Designer.cs">
+      <DependentUpon>201911201316320_update_dateofbirth_data_type_to_string.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActionType.cs" />
     <Compile Include="Models\Author.cs" />
@@ -415,6 +419,11 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201911201316320_update_dateofbirth_data_type_to_string.resx">
+      <DependentUpon>201911201316320_update_dateofbirth_data_type_to_string.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
