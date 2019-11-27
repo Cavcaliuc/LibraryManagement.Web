@@ -12,6 +12,7 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using SendGrid.Helpers.Mail;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using SendGrid;
 using LibraryManagement.Web;
 
@@ -65,7 +66,6 @@ public class TwilioMessageSender : ITwilioMessageSender
 
     public async Task SendMessageAsync(string to, string from, string body)
     {
-        //var toPhoneNumber = !string.IsNullOrWhiteSpace(to) ? Encryption.Decrypt(to) : to;
         await MessageResource.CreateAsync(new PhoneNumber(to),
                                           from: new PhoneNumber(from),
                                           body: body);
@@ -83,11 +83,18 @@ public class SmsService : IIdentityMessageService
         _messageSender = messageSender;
     }
 
-    public async Task SendAsync(IdentityMessage message)
+    public async Task SendAsync(IdentityMessage message)//, bool needDencrytion = true
     {
-        await _messageSender.SendMessageAsync(message.Destination,
+        var to = isValidPhoneNo(message.Destination) ? message.Destination : Encryption.Decrypt(message.Destination);
+        await _messageSender.SendMessageAsync(to,
                                               System.Configuration.ConfigurationManager.AppSettings["TWILIONUMBER"],
                                               message.Body);
+    }
+
+    private bool isValidPhoneNo(string messageDestination)
+    {
+        return Regex.IsMatch(messageDestination, @"^[\+]{0,1}[1-9]{1}[0-9]{7,11}$");
+
     }
 }
 

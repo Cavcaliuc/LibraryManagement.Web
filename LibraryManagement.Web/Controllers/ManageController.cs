@@ -94,7 +94,7 @@ namespace LibraryManagement.Web.Controllers
             var user = ApplicationDbContext.Users
                 .Include(s => s.Location)
                 .FirstOrDefault(x => x.Id == userId);
-
+           
             if (user != null)
             {
                 model.UserName = user.UserName;
