@@ -16,6 +16,7 @@ using Microsoft.Owin.Security;
 using LibraryManagement.Web.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Text.RegularExpressions;
+using CaptchaMvc.HtmlHelpers;
 
 namespace LibraryManagement.Web.Controllers
 {

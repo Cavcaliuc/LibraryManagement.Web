@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Register";
 }
+@using CaptchaMvc.HtmlHelpers;
 
 <h2>@ViewBag.Title.</h2>
 
@@ -76,6 +77,12 @@
             @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
         </div>
     </div>
+   
+    <tr>
+            <td>Verification</td>
+            <td>@Html.Captcha(5)</td>
+        </tr>
+    
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input type="submit" class="btn btn-default" value="Register" />
