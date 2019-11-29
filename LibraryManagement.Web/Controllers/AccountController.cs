@@ -199,7 +199,7 @@ namespace LibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase fileUpload)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && this.IsCaptchaValid("Invalid captcha"))
             {
                 var userLocation = GetOrSaveUserLocation(model);
 

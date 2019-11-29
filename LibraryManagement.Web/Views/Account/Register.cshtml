@@ -13,19 +13,19 @@
     <hr />
     @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
-        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label form-required-field" })
         <div class="col-md-10">
             @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label form-required-field" })
         <div class="col-md-10">
             @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.CountryName, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.CountryName, new { @class = "col-md-2 control-label form-required-field" })
         <div class="col-md-10">
             @Html.TextBoxFor(m => m.CountryName, new { @class = "form-control" })
             @Html.HiddenFor(model => model.CountryId)
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.ParentLocationName, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.ParentLocationName, new { @class = "col-md-2 control-label form-required-field" })
         <div class="col-md-10">
             @Html.TextBoxFor(m => m.ParentLocationName, new { @class = "form-control" })
             @Html.HiddenFor(model => model.ParentLocationId)
@@ -66,22 +66,27 @@
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label form-required-field" })
         <div class="col-md-10">
             @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
+        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label form-required-field" })
         <div class="col-md-10">
             @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
         </div>
     </div>
-   
-    <tr>
+    <div class="form-group">
+        @Html.Label("Security check", new { @class = "col-md-2 control-label form-required-field" })
+        <div class="col-md-10">
+            @Html.Captcha(5)
+        </div>
+    </div>
+    @*<tr>
             <td>Verification</td>
             <td>@Html.Captcha(5)</td>
-        </tr>
+        </tr>*@
     
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
