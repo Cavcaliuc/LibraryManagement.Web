@@ -153,34 +153,34 @@
 
                     #region Item
 
-                    var item0 = new Item { Title = "Zece negri mititei", OrdersCount = 1, Category = carte, Publisher = rao, Author = agathaChristie };
+                    var item0 = new Item { Title = "Zece negri mititei", OrdersCount = 1, Category = carte, Publisher = rao, Author = agathaChristie, Year = 2000 };
                     context.Items.AddOrUpdate(item0);
 
-                    var item1 = new Item { Title = "Simbolul pierdut", OrdersCount = 1, Category = carte, Publisher = rao, Author = danBrown };
+                    var item1 = new Item { Title = "Simbolul pierdut", OrdersCount = 1, Category = carte, Publisher = rao, Author = danBrown, Year = 2000 };
                     context.Items.AddOrUpdate(item1);
 
-                    var item2 = new Item { Title = "Amintiri din copilărie", OrdersCount = 1, Category = carte, Publisher = arc, Author = ionCreaga };
+                    var item2 = new Item { Title = "Amintiri din copilărie", OrdersCount = 1, Category = carte, Publisher = arc, Author = ionCreaga, Year = 2000 };
                     context.Items.AddOrUpdate(item2);
 
-                    var item3 = new Item { Title = "Poezii", OrdersCount = 1, Category = carte, Publisher = litera, Author = mihaiEminescu };
+                    var item3 = new Item { Title = "Poezii", OrdersCount = 1, Category = carte, Publisher = litera, Author = mihaiEminescu, Year = 2000 };
                     context.Items.AddOrUpdate(item3);
 
-                    var item4 = new Item { Title = "Moarte subită", OrdersCount = 1, Category = carte, Publisher = trei, Author = jkrowling };
+                    var item4 = new Item { Title = "Moarte subită", OrdersCount = 1, Category = carte, Publisher = trei, Author = jkrowling, Year = 2000 };
                     context.Items.AddOrUpdate(item4);
 
-                    var item5 = new Item { Title = "Anotimpuri diferite", OrdersCount = 1, Category = carte, Publisher = trei, Author = stephenKing };
+                    var item5 = new Item { Title = "Anotimpuri diferite", OrdersCount = 1, Category = carte, Publisher = trei, Author = stephenKing, Year = 2000 };
                     context.Items.AddOrUpdate(item5);
 
-                    var item6 = new Item { Title = "Dicționar al religiilor", OrdersCount = 1, Category = carte, Publisher = polirom, Author = mirceaEliade };
+                    var item6 = new Item { Title = "Dicționar al religiilor", OrdersCount = 1, Category = carte, Publisher = polirom, Author = mirceaEliade, Year = 2000 };
                     context.Items.AddOrUpdate(item6);
 
-                    var item7 = new Item { Title = "Curcubeul", OrdersCount = 1, Category = carte, Publisher = litera, Author = grigoreVieru };
+                    var item7 = new Item { Title = "Curcubeul", OrdersCount = 1, Category = carte, Publisher = litera, Author = grigoreVieru, Year = 2000 };
                     context.Items.AddOrUpdate(item7);
 
-                    var item8 = new Item { Title = "Poezii - Poems, editie bilingva", OrdersCount = 1, Category = carte, Publisher = teora, Author = mihaiEminescu };
+                    var item8 = new Item { Title = "Poezii - Poems, editie bilingva", OrdersCount = 1, Category = carte, Publisher = teora, Author = mihaiEminescu, Year = 2000 };
                     context.Items.AddOrUpdate(item8);
 
-                    var item9 = new Item { Title = "Moarte printre nori", OrdersCount = 1, Category = carte, Publisher = litera, Author = agathaChristie };
+                    var item9 = new Item { Title = "Moarte printre nori", OrdersCount = 1, Category = carte, Publisher = litera, Author = agathaChristie, Year = 2000 };
                     context.Items.AddOrUpdate(item9);
                     context.SaveChanges();
 
