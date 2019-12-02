@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using LibraryManagement.Web.Models;
+using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
+using System.Text.RegularExpressions;
 
 namespace LibraryManagement.Web
 {
@@ -62,6 +61,35 @@ namespace LibraryManagement.Web
             objrij.IV = EncryptionkeyBytes;
             byte[] TextByte = objrij.CreateDecryptor().TransformFinalBlock(encryptedTextByte, 0, encryptedTextByte.Length);
             return Encoding.UTF8.GetString(TextByte);  //it will return readable string
+        }
+        public static bool IsValidEmail(string strIn)
+        {
+            // Return true if strIn is in valid e-mail format.
+            return Regex.IsMatch(strIn, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
+        }
+
+
+        public static string EncryptionForEmail(string textdata)
+        {
+            var isEmailValid = IsValidEmail(textdata);
+            if (isEmailValid)
+            {
+                // Require the user to have a confirmed email before they can log on.
+                return Encrypt(textdata);
+            }
+            return textdata;
+            
+        }
+
+        public static string DecryptionForEmail(string textdata)
+        {
+            var isEmailValid = IsValidEmail(textdata);
+            if (isEmailValid)
+            {
+                // Require the user to have a confirmed email before they can log on.
+                return textdata;
+            }
+            return Decrypt(textdata);
         }
     }
 }

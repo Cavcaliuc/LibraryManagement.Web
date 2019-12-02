@@ -98,7 +98,7 @@ namespace LibraryManagement.Web.Controllers
             if (user != null)
             {
                 model.UserName = user.UserName;
-                model.Email = Encryption.Decrypt(user.Email);
+                model.Email = Encryption.DecryptionForEmail(user.Email);
                 model.Photo = user.Photo;
                 model.PhotoThumbnail = user.PhotoThumbnail;
                 model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
@@ -228,7 +228,7 @@ namespace LibraryManagement.Web.Controllers
                 if (user != null)
                 {
                     user.PhoneNumber = Encryption.Encrypt(model.PhoneNumber);
-                    user.Email = Encryption.Encrypt(user.Email);
+                    user.Email = Encryption.EncryptionForEmail(user.Email);
                    
                     ApplicationDbContext.Entry(user).State = EntityState.Modified;
                     ApplicationDbContext.SaveChanges();
@@ -378,7 +378,7 @@ namespace LibraryManagement.Web.Controllers
             var savedUser = ApplicationDbContext.Users.FirstOrDefault(x => x.Id == userId);
             if (savedUser == null) return;
 
-            savedUser.Email = toEncrypt ? Encryption.Encrypt(savedUser.Email) : Encryption.Decrypt(savedUser.Email);
+            savedUser.Email = toEncrypt ? Encryption.EncryptionForEmail(savedUser.Email) : Encryption.DecryptionForEmail(savedUser.Email);
 
             ApplicationDbContext.Entry(savedUser).State = EntityState.Modified;
             ApplicationDbContext.SaveChanges();

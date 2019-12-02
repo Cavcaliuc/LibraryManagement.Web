@@ -17,6 +17,7 @@ using LibraryManagement.Web.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Text.RegularExpressions;
 using CaptchaMvc.HtmlHelpers;
+using Twilio.Rest.Taskrouter.V1.Workspace;
 
 namespace LibraryManagement.Web.Controllers
 {
@@ -96,11 +97,18 @@ namespace LibraryManagement.Web.Controllers
                 return View(model);
             }
             ApplicationUser user;
-            var isEmailValid = IsValidEmail(model.EmailOrUserName);
+            var isEmailValid = Encryption.IsValidEmail(model.EmailOrUserName);
             if (isEmailValid)
             {
                 // Require the user to have a confirmed email before they can log on.
-                user = await UserManager.FindByEmailAsync(Encryption.Encrypt(model.EmailOrUserName));
+                user = await UserManager.FindByEmailAsync(Encryption.EncryptionForEmail(model.EmailOrUserName));
+                if (user == null)
+                {
+                    user = await UserManager.FindByEmailAsync(model.EmailOrUserName);
+                    if (user != null) UpdateUserEmail(user.Id);
+
+                }
+
             }
             else
                 user = await UserManager.FindByNameAsync(model.EmailOrUserName);
@@ -204,6 +212,7 @@ namespace LibraryManagement.Web.Controllers
                 var userLocation = GetOrSaveUserLocation(model);
 
                 AddPhotoToViewModel(model, fileUpload);
+                if (!ModelState.IsValid) return View(model);
 
                 var user = new ApplicationUser
                 {
@@ -255,7 +264,7 @@ namespace LibraryManagement.Web.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        
+
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
@@ -273,7 +282,7 @@ namespace LibraryManagement.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByEmailAsync(Encryption.Encrypt(model.Email));
+                var user = await UserManager.FindByEmailAsync(Encryption.EncryptionForEmail(model.Email));
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -322,7 +331,7 @@ namespace LibraryManagement.Web.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByEmailAsync(Encryption.Encrypt((model.Email)));
+            var user = await UserManager.FindByEmailAsync(Encryption.EncryptionForEmail((model.Email)));
             if (user == null)
             {
                 // Don't reveal that the user does not exist
@@ -446,7 +455,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = Encryption.Encrypt(model.Email) };
+                var user = new ApplicationUser { UserName = model.Email, Email = Encryption.EncryptionForEmail(model.Email) };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -509,8 +518,16 @@ namespace LibraryManagement.Web.Controllers
 
         private void AddPhotoToViewModel(RegisterViewModel model, HttpPostedFileBase fileUpload)
         {
+
             if (fileUpload != null && fileUpload.ContentLength > 0)
             {
+                var fileName = Path.GetFileName(fileUpload.FileName);
+                var fileExtension = Path.GetExtension(fileName);
+                if ((fileExtension != ".jpg") && (fileExtension != ".gif") && (fileExtension != ".png"))
+                {
+                    ModelState.AddModelError("Photo","Please add a valid image file");
+                    return;
+                }
                 //attach the uploaded image to the object before saving to Database
                 //model.ImageMimeType = fileUpload.ContentLength;
                 model.Photo = new byte[fileUpload.ContentLength];
@@ -598,7 +615,7 @@ namespace LibraryManagement.Web.Controllers
             var savedUser = ApplicationDbContext.Users.FirstOrDefault(x => x.Id == userId);
             if (savedUser == null) return;
 
-            savedUser.Email = toEncrypt ? Encryption.Encrypt(savedUser.Email) : Encryption.Decrypt(savedUser.Email);
+            savedUser.Email = toEncrypt ? Encryption.EncryptionForEmail(savedUser.Email) : Encryption.DecryptionForEmail(savedUser.Email);
 
             ApplicationDbContext.Entry(savedUser).State = EntityState.Modified;
             ApplicationDbContext.SaveChanges();
@@ -688,11 +705,7 @@ namespace LibraryManagement.Web.Controllers
                 context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
             }
         }
-        bool IsValidEmail(string strIn)
-        {
-            // Return true if strIn is in valid e-mail format.
-            return Regex.IsMatch(strIn, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
-        }
+
         #endregion
     }
 }
