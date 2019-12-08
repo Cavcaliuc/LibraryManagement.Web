@@ -365,6 +365,7 @@ namespace LibraryManagement.Web.Controllers
             orderModel.ModifiedById = order.ModifiedBy?.Id;
             orderModel.ModifiedByName = order.ModifiedBy?.UserName;
             orderModel.ModifiedDate = order.ModifiedDate;
+            orderModel.OrderId = order.Id;
 
             orderModel.Messages = ApplicationDbContext.Messages
                 .Where(x => x.OrderId == order.Id)
@@ -440,6 +441,21 @@ namespace LibraryManagement.Web.Controllers
                 UserManager.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public void AddMessage(int id, string message)
+        {
+            Order order = ApplicationDbContext.Orders.Find(id);
+
+            order.Messages.Add(new Message
+            {
+                Text = Encryption.Encrypt(message),
+                CreatedDate = DateTime.UtcNow,
+                CreatedBy = UserManager.FindById(System.Web.HttpContext.Current.User.Identity.GetUserId())
+            });
+
+            ApplicationDbContext.Entry(order).State = EntityState.Modified;
+            ApplicationDbContext.SaveChangesAsync();
         }
     }
 }

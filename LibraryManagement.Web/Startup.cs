@@ -13,6 +13,7 @@ namespace LibraryManagement.Web
         {
             ConfigureAuth(app);
             CreateRolesAndUsers();
+            app.MapSignalR();
         }
 
         private void CreateRolesAndUsers()
