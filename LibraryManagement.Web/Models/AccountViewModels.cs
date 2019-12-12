@@ -7,8 +7,35 @@ namespace LibraryManagement.Web.Models
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Display(Name = "User name")]
+        public string UserName { get; set; }
+
+        public long? CountryId { get; set; }
+
+        [Required]
+        [Display(Name = "Country")]
+        public string CountryName { get; set; }
+
+        public long? ParentLocationId { get; set; }
+
+        [Required]
+        [Display(Name = "City")]
+        public string ParentLocationName { get; set; }
+
+        public long? LocationId { get; set; }
+
+        [Display(Name = "Location")]
+        public string LocationName { get; set; }
+
+
+        [Display(Name = "Date Of Birth")]
+        [DataType(DataType.Date)]
+        public DateTime? DateOfBirth { get; set; }
+
+        [DataType(DataType.Upload)]
+        public byte[] Photo { get; set; }
+
+        public byte[] PhotoThumbnail { get; set; }
     }
 
     public class ExternalLoginListViewModel

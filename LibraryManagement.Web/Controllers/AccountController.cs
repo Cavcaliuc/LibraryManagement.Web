@@ -410,7 +410,7 @@ namespace LibraryManagement.Web.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
                 return RedirectToAction("Login");
@@ -431,7 +431,7 @@ namespace LibraryManagement.Web.Controllers
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel {UserName = loginInfo.DefaultUserName });
             }
         }
 
@@ -455,14 +455,37 @@ namespace LibraryManagement.Web.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = Encryption.EncryptionForEmail(model.Email) };
+
+                var tempRegisterViewModel = new RegisterViewModel{
+                    CountryId = model.CountryId,
+                    CountryName = model.CountryName,
+                    LocationId = model.LocationId,
+                    LocationName = model.LocationName,
+                    ParentLocationId = model.ParentLocationId,
+                    ParentLocationName = model.ParentLocationName
+                };
+                var userLocation = GetOrSaveUserLocation(tempRegisterViewModel);
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = info.Email,
+                    DateOfBirth = Encryption.Encrypt(model.DateOfBirth.ToString()),
+                    Location = userLocation,
+                    Photo = model.Photo,
+                    PhotoThumbnail = model.PhotoThumbnail,
+                    EmailConfirmed = true
+                };
+
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    await UserManager.AddToRoleAsync(user.Id, "RegularUser");
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        UpdateUserEmail(user.Id);
                         return RedirectToLocal(returnUrl);
                     }
                 }
