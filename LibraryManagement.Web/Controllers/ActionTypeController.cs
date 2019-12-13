@@ -10,6 +10,7 @@ using LibraryManagement.Web.Models;
 
 namespace LibraryManagement.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ActionTypeController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
