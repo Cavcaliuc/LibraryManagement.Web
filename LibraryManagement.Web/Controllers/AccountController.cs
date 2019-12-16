@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -16,6 +17,7 @@ using Microsoft.Owin.Security;
 using LibraryManagement.Web.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Text.RegularExpressions;
+using System.Web.Configuration;
 using CaptchaMvc.HtmlHelpers;
 using Twilio.Rest.Taskrouter.V1.Workspace;
 
@@ -205,13 +207,13 @@ namespace LibraryManagement.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase fileUpload)
+        public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid && this.IsCaptchaValid("Invalid captcha"))
             {
                 var userLocation = GetOrSaveUserLocation(model);
 
-                AddPhotoToViewModel(model, fileUpload);
+                AddPhotoToViewModel(model);
                 if (!ModelState.IsValid) return View(model);
 
                 var user = new ApplicationUser
@@ -431,7 +433,7 @@ namespace LibraryManagement.Web.Controllers
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel {UserName = loginInfo.DefaultUserName });
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
             }
         }
 
@@ -456,7 +458,8 @@ namespace LibraryManagement.Web.Controllers
                     return View("ExternalLoginFailure");
                 }
 
-                var tempRegisterViewModel = new RegisterViewModel{
+                var tempRegisterViewModel = new RegisterViewModel
+                {
                     CountryId = model.CountryId,
                     CountryName = model.CountryName,
                     LocationId = model.LocationId,
@@ -539,29 +542,30 @@ namespace LibraryManagement.Web.Controllers
             return Json(titles);
         }
 
-        private void AddPhotoToViewModel(RegisterViewModel model, HttpPostedFileBase fileUpload)
+        private void AddPhotoToViewModel(RegisterViewModel model)
         {
 
-            if (fileUpload != null && fileUpload.ContentLength > 0)
+            if (model.FileUpload != null && model.FileUpload.ContentLength > 0)
             {
-                var fileName = Path.GetFileName(fileUpload.FileName);
-                var fileExtension = Path.GetExtension(fileName);
-                if ((fileExtension != ".jpg") && (fileExtension != ".gif") && (fileExtension != ".png"))
+                var fileName = Path.GetFileName(model.FileUpload.FileName);
+                var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+                if (fileExtension != ".jpg" && fileExtension != ".gif" && fileExtension != ".png" && fileExtension != ".jpeg")
                 {
-                    ModelState.AddModelError("Photo","Please add a valid image file");
+                    ModelState.AddModelError("Photo", "Please add a valid image file format");
                     return;
                 }
+
                 //attach the uploaded image to the object before saving to Database
                 //model.ImageMimeType = fileUpload.ContentLength;
-                model.Photo = new byte[fileUpload.ContentLength];
-                fileUpload.InputStream.Read(model.Photo, 0, fileUpload.ContentLength);
+                model.Photo = new byte[model.FileUpload.ContentLength];
+                model.FileUpload.InputStream.Read(model.Photo, 0, model.FileUpload.ContentLength);
 
                 //Save image to file
-                var filename = fileUpload.FileName;
+                var filename = model.FileUpload.FileName;
                 var filePathOriginal = Server.MapPath("/Content/Uploads/Originals");
                 var filePathThumbnail = Server.MapPath("/Content/Uploads/Thumbnails");
                 string savedFileName = Path.Combine(filePathOriginal, filename);
-                fileUpload.SaveAs(savedFileName);
+                model.FileUpload.SaveAs(savedFileName);
 
                 //Read image back from file and create thumbnail from it
                 var imageFile = Path.Combine(Server.MapPath("~/Content/Uploads/Originals"), filename);

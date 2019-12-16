@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 namespace LibraryManagement.Web.Models
 {
@@ -125,6 +126,11 @@ namespace LibraryManagement.Web.Models
         [Display(Name = "Date Of Birth")]
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
+
+        [Required]
+        [Display(Name = "Upload File")]
+        [AllowFileSize(FileSize = 10 * 1024 * 1024, ErrorMessage = "Maximum allowed file size is 10 MB")]
+        public HttpPostedFileBase FileUpload { get; set; }
 
         [DataType(DataType.Upload)]
         public byte[] Photo { get; set; }
