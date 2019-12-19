@@ -129,7 +129,7 @@ namespace LibraryManagement.Web.Models
 
         [Required]
         [Display(Name = "Upload File")]
-        [AllowFileSize(FileSize = 10 * 1024 * 1024, ErrorMessage = "Maximum allowed file size is 10 MB")]
+        [AllowFileSize(FileSize = 3 * 1024 * 1024, ErrorMessage = "Maximum allowed file size is 10 MB")]
         public HttpPostedFileBase FileUpload { get; set; }
 
         [DataType(DataType.Upload)]

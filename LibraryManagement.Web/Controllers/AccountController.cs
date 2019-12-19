@@ -648,6 +648,38 @@ namespace LibraryManagement.Web.Controllers
             ApplicationDbContext.SaveChanges();
         }
 
+        public FileContentResult GetUserPhoto(bool isThumbNail = true, string username = "")
+        {
+            ApplicationUser user = null;
+            if (string.IsNullOrEmpty((username)))
+            {
+                string userId = User.Identity.GetUserId();
+                user = ApplicationDbContext.Users.FirstOrDefault(x => x.Id == userId);
+            }
+            else
+            {
+                user = ApplicationDbContext.Users.FirstOrDefault(x => x.UserName == username);
+            }
+
+            if (user?.Photo == null)
+            {
+                string fileName = HttpContext?.Server.MapPath(@"~/Content/Images/noImg.png");
+
+                byte[] imageData = null;
+                FileInfo fileInfo = new FileInfo(fileName);
+                long imageFileLength = fileInfo.Length;
+                FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                BinaryReader br = new BinaryReader(fs);
+                imageData = br.ReadBytes((int)imageFileLength);
+
+                return File(imageData, "image/png");
+
+            }
+
+            var photo = isThumbNail ? user.PhotoThumbnail : user.Photo;
+            return new FileContentResult(photo, "image/jpeg");
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
