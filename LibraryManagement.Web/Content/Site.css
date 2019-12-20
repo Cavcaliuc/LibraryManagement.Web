@@ -28,3 +28,21 @@ textarea {
     font-weight: bold;
     color: red;
 }
+.profile-image {
+    height: 40px;
+    width: 40px; 
+    margin: auto; 
+    -moz-border-radius: 60px;
+    border-radius: 100px;
+    padding: 3px;
+}
+
+.chat-image {
+    height: 50px;
+    width: 50px; 
+    margin: auto; 
+    -moz-border-radius: 60px;
+    border-radius: 100px;
+    padding: 2px;
+    box-shadow: 0px 0px 20px #888;
+}

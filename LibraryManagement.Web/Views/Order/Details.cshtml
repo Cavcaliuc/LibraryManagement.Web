@@ -3,14 +3,21 @@
 @using Microsoft.AspNet.Identity
 @model LibraryManagement.Web.Models.OrderModel
 
+@functions{
+    public string GetFormattedDate(DateTime date)
+    {
+        return date.ToString("dd MMM (h:mm tt)");
+    }
+}
+
 @{
     ViewBag.Title = "Order";
-    var messages = @Model.Messages.ToPagedList((int)ViewBag.Page, 10);
+    var messages = Model.Messages.ToPagedList((int)ViewBag.Page, 10);
     string currentSort = ViewBag.currentSort;
     var loggedUserImgSrc = Url.Action("GetUserPhoto", "Account");
     var currentUser = User.Identity.GetUserName();
     var secondUser = (currentUser == Model.OwnerUserName ? Model.CreatedByName : Model.OwnerUserName);
-    var secondUserImgSrc = Url.Action("GetUserPhoto", "Account", new {isThumbNail = true, username = secondUser});
+    var secondUserImgSrc = Url.Action("GetUserPhoto", "Account", new { isThumbNail = true, username = secondUser });
 
     <div class="form-horizontal">
         <h4>Order Details</h4>
@@ -182,23 +189,17 @@
     <div class="chat-panel panel panel-default">
         <div class="panel-body" id="chat" style="height:400px;">
             <div id="discussion">
-            @foreach (var item in messages.Reverse())
-            {
+                @foreach (var item in messages.Reverse())
+                {
                 <p style="color: blue; text-align: @(item.UserName == User.Identity.GetUserName() ? "right" : "left")">
                     <strong>
-                        <img 
-                            src="@(item.UserName != User.Identity.GetUserName() ? @sec : @loggedUserImgSrc)" 
-                            title="@item.UserName"
-                            height="50" width="50"
-                            style="margin: auto;
-                                -moz-border-radius: 60px;
-                                border-radius: 100px;
-                                padding: 6px"
-                                box-shadow: 0px 0px 20px #888;"/>
+                        <img src="@(item.UserName != User.Identity.GetUserName() ? @secondUserImgSrc : @loggedUserImgSrc)"
+                             title="@item.UserName"
+                             class="chat-image" />
                     </strong>
-                    @item.Text [@item.CreatedDate]
+                    @item.Text [@GetFormattedDate(@item.CreatedDate)]
                 </p>
-            }
+                }
             </div>
         </div>
         <div class="panel-footer">
@@ -225,15 +226,15 @@
         var chat = $.connection.chatHub;
         // Create a function that the hub can call back to display messages.
         chat.client.addNewMessageToPage = function (name, message) {
-            if (name !== @currentUser) {
+            if (name !== '@currentUser') {
                 // Add the message to the page.
-            $('#discussion').append(`<p style="color:green; text-align:left; width:500px"><strong><img = src="@loggedUserImgSrc" title="${user}">`
-                + ' </strong> ' + htmlEncode(message) + '</p>');
+                $('#discussion').append(`<p style="color:blue; text-align:left; width:500px"><strong><img src="@secondUserImgSrc" class="chat-image" title="${'@currentUser'}">`
+                    + ' </strong> ' + htmlEncode(message) + ' ' + '[@GetFormattedDate(DateTime.UtcNow)]' + '</p>');
             }
             else {
                 // Add the message to the page.
-            $('#discussion').append(`<p style="color:blue;text-align:right;"><strong><img = src="@secondUserImgSrc" title="${@secondUser}">`
-                + ' </strong> ' + htmlEncode(message) + '</p>');
+            $('#discussion').append(`<p style="color:blue;text-align:right;"><strong><img = src="@loggedUserImgSrc" class="chat-image" title="${'@secondUser'}">`
+                + ' </strong> ' + htmlEncode(message) + ' ' + '[@GetFormattedDate(DateTime.UtcNow)]' +  '</p>');
             }
             $('#discussion').scrollTop = $('#discussion')[0].scrollHeight;
             $("#chat").animate({scrollTop:$("#chat")[0].scrollHeight}, 1000);
@@ -246,7 +247,7 @@
             chat.server.joinRoom('@Model.OrderId');
             var sendMessageFunction = () => {
                 // Call the Send method on the hub.
-                chat.server.send('@Model.OrderId', user, $('#message').val());
+                chat.server.send('@Model.OrderId', '@currentUser', $('#message').val());
                 // Clear text box and reset focus for next comment.
                 $('#message').val('').focus();
             };
@@ -261,6 +262,6 @@
             var encodedValue = $('<div />').text(value).html();
             return encodedValue;
         }
-    });    
+    });
     </script>
 }
