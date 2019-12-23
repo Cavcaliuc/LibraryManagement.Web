@@ -89,10 +89,11 @@ namespace LibraryManagement.Web.Controllers
         public ActionResult Index(ManageAccountModel account)
         {
             string id = User.Identity.GetUserId();
-            var currentUser = ApplicationDbContext.Users.FirstOrDefault(u => u.Id == id);
+            var currentUser = ApplicationDbContext.Users.FirstOrDefault(u => u.Id == id) 
+                              ?? throw new ArgumentNullException("User not found");
             var location = GetOrSaveUserLocation(account);
 
-            if(currentUser.UserName != account.UserName)
+            if (currentUser.UserName != account.UserName)
             {
                 currentUser.UserName = account.UserName;
             }
@@ -100,13 +101,10 @@ namespace LibraryManagement.Web.Controllers
             {
                 currentUser.DateOfBirth = Encryption.Encrypt(account.DateOfBirth.ToString());
             }
-            if (currentUser.Location.CountryId != location.CountryId)
+            
+            if (currentUser.Location != location)
             {
-                currentUser.Location.CountryId = location.CountryId;
-            }
-            if (currentUser.Location.ParentLocationId != location.ParentLocationId)
-            {
-                currentUser.Location.ParentLocationId = location.ParentLocationId;
+                currentUser.Location = location;
             }
 
             ApplicationDbContext.Entry(currentUser).State = EntityState.Modified;
@@ -230,7 +228,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     user.PhoneNumber = Encryption.Encrypt(model.PhoneNumber);
                     user.Email = Encryption.EncryptionForEmail(user.Email);
-                   
+
                     ApplicationDbContext.Entry(user).State = EntityState.Modified;
                     ApplicationDbContext.SaveChanges();
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -517,22 +515,20 @@ namespace LibraryManagement.Web.Controllers
             }
 
             var userLocation = parentLocation;
-            if (!string.IsNullOrWhiteSpace(model.LocationName))
+            if (string.IsNullOrWhiteSpace(model.LocationName)) return userLocation;
+
+            var location = ApplicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
+                .Include(y => y.ParentLocation)
+                .FirstOrDefault(x => x.ParentLocationId.HasValue && x.ParentLocationId.Value == parentLocation.Id);
+
+            if (location == null)
             {
-                var location = ApplicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
-                    .Include(y => y.ParentLocation)
-                    .FirstOrDefault(x => x.ParentLocationId.HasValue && x.ParentLocationId.Value == parentLocation.Id);
-
-                if (location == null)
-                {
-                    location = ApplicationDbContext.Locations.Add(
-                        new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
-                    ApplicationDbContext.SaveChanges();
-                }
-
-                userLocation = location;
+                location = ApplicationDbContext.Locations.Add(
+                    new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
+                ApplicationDbContext.SaveChanges();
             }
 
+            userLocation = location;
             return userLocation;
         }
 
