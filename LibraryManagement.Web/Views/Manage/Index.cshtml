@@ -8,64 +8,85 @@
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div>
     <h4>Change your account settings</h4>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
 
+    <div class="form-horizontal">
+        <h4>Order</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <table class="table">
-        <tr>
-            <td>
-                <dl class="dl-horizontal">
-                    <dt>
-                        @Html.DisplayNameFor(model => model.UserName)
-                    </dt>
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.UserName)
-                    </dd>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Email)
-                    </dt>
+            </div>
+        </div>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Email)
-                    </dd>
+        <div class="form-group">
+            @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DateOfBirth, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.DateOfBirth)
-                    </dt>
+        <div class="form-group">
+            @Html.LabelFor(model => model.CountryName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.CountryName, new { @class = "form-control" })
+                @Html.HiddenFor(model => model.CountryId)
 
-                    <dd>
-                        @Html.DisplayFor(model => model.DateOfBirth)
-                    </dd>
+                @Html.ValidationMessageFor(model => model.CountryName, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.CountryName)
-                    </dt>
+        <div class="form-group">
+            @Html.LabelFor(model => model.ParentLocationName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.ParentLocationName, new { @class = "form-control" })
+                @Html.HiddenFor(model => model.ParentLocationId)
 
-                    <dd>
-                        @Html.DisplayFor(model => model.CountryName)
-                        @Html.HiddenFor(model => model.CountryId)
+                @Html.ValidationMessageFor(model => model.ParentLocationName, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
-                    </dd>
+        <div class="form-group">
+            @Html.LabelFor(model => model.LocationName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.LocationName, new { @class = "form-control" })
+                @Html.HiddenFor(model => model.LocationId)
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.LocationFullName)
-                    </dt>
+                @Html.ValidationMessageFor(model => model.LocationName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Photo, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input name="fileUpload" type="file" accept=".png,.jpg,.jpeg,.gif,.tif" />
+                @Html.ValidationMessageFor(model => model.Photo)
+            </div>
+        </div>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.LocationFullName)
-                        @Html.HiddenFor(model => model.LocationId)
-                        @Html.HiddenFor(model => model.ParentLocationId)
-                        <a href='@Url.Action("Manage", "ManageLogins")'>
-                            <img height="25" width="25" src="~/Content/Images/edit.png" />
-                        </a>
-                    </dd>
-                </dl>
-            </td>
-        </tr>
-    </table>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    }
 
-    
 
     <dl class="dl-horizontal">
         <dt>Password:</dt>
@@ -87,12 +108,12 @@
             @Html.ActionLink("Manage", "ManageLogins") ]
         </dd>
         @*
-        Phone Numbers can used as a second factor of verification in a two-factor authentication system.
+            Phone Numbers can used as a second factor of verification in a two-factor authentication system.
 
-         See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-            for details on setting up this ASP.NET application to support two-factor authentication using SMS.
+             See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
+                for details on setting up this ASP.NET application to support two-factor authentication using SMS.
 
-         Uncomment the following block after you have set up two-factor authentication
+             Uncomment the following block after you have set up two-factor authentication
         *@
         <dt>Phone Number:</dt>
         <dd>

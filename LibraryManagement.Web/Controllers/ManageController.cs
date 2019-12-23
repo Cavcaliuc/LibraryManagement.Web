@@ -79,38 +79,39 @@ namespace LibraryManagement.Web.Controllers
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
                 : "";
 
-            var userId = User.Identity.GetUserId();
-
-            var phoneNumber = await UserManager.GetPhoneNumberAsync(userId);
-            var model = new ManageAccountModel
-            {
-                HasPassword = HasPassword(),
-                PhoneNumber = !string.IsNullOrWhiteSpace(phoneNumber) ? Encryption.Decrypt(phoneNumber) : phoneNumber,
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
-            };
-
-            var user = ApplicationDbContext.Users
-                .Include(s => s.Location)
-                .FirstOrDefault(x => x.Id == userId);
-           
-            if (user != null)
-            {
-                model.UserName = user.UserName;
-                model.Email = Encryption.DecryptionForEmail(user.Email);
-                model.Photo = user.Photo;
-                model.PhotoThumbnail = user.PhotoThumbnail;
-                model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
-                model.LocationId = user.Location?.Id;
-                model.LocationName = user.Location?.Name;
-                model.ParentLocationId = user.Location?.ParentLocation?.Id;
-                model.ParentLocationName = user.Location?.ParentLocation?.Name;
-                model.CountryId = user.Location?.Country.Id;
-                model.CountryName = user.Location?.Country.Name;
-            }
+            ManageAccountModel model = await GetManageAccountModel();
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Index(ManageAccountModel account)
+        {
+            string id = User.Identity.GetUserId();
+            var currentUser = ApplicationDbContext.Users.FirstOrDefault(u => u.Id == id);
+            var location = GetOrSaveUserLocation(account);
+
+            if(currentUser.UserName != account.UserName)
+            {
+                currentUser.UserName = account.UserName;
+            }
+            if (currentUser.DateOfBirth != Encryption.Encrypt(account.DateOfBirth.ToString()))
+            {
+                currentUser.DateOfBirth = Encryption.Encrypt(account.DateOfBirth.ToString());
+            }
+            if (currentUser.Location.CountryId != location.CountryId)
+            {
+                currentUser.Location.CountryId = location.CountryId;
+            }
+            if (currentUser.Location.ParentLocationId != location.ParentLocationId)
+            {
+                currentUser.Location.ParentLocationId = location.ParentLocationId;
+            }
+
+            ApplicationDbContext.Entry(currentUser).State = EntityState.Modified;
+            ApplicationDbContext.SaveChanges();
+            return RedirectToAction("Index");
         }
 
         //
@@ -408,6 +409,41 @@ namespace LibraryManagement.Web.Controllers
             base.Dispose(disposing);
         }
 
+        private async Task<ManageAccountModel> GetManageAccountModel()
+        {
+            var userId = User.Identity.GetUserId();
+
+            var phoneNumber = await UserManager.GetPhoneNumberAsync(userId);
+            var model = new ManageAccountModel
+            {
+                HasPassword = HasPassword(),
+                PhoneNumber = !string.IsNullOrWhiteSpace(phoneNumber) ? Encryption.Decrypt(phoneNumber) : phoneNumber,
+                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
+                Logins = await UserManager.GetLoginsAsync(userId),
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+            };
+
+            var user = ApplicationDbContext.Users
+                .Include(s => s.Location)
+                .FirstOrDefault(x => x.Id == userId);
+
+            if (user != null)
+            {
+                model.UserName = user.UserName;
+                model.Email = Encryption.DecryptionForEmail(user.Email);
+                model.Photo = user.Photo;
+                model.PhotoThumbnail = user.PhotoThumbnail;
+                model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
+                model.LocationId = user.Location?.Id;
+                model.LocationName = user.Location?.Name;
+                model.ParentLocationId = user.Location?.ParentLocation?.Id;
+                model.ParentLocationName = user.Location?.ParentLocation?.Name;
+                model.CountryId = user.Location?.Country.Id;
+                model.CountryName = user.Location?.Country.Name;
+            }
+            return model;
+        }
+
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
@@ -457,6 +493,47 @@ namespace LibraryManagement.Web.Controllers
             RemoveLoginSuccess,
             RemovePhoneSuccess,
             Error
+        }
+
+        private Location GetOrSaveUserLocation(ManageAccountModel model)
+        {
+            var country = ApplicationDbContext.Countries.FirstOrDefault(x => x.Name.ToUpper() == model.CountryName.ToUpper());
+            if (country == null)
+            {
+                country = ApplicationDbContext.Countries.Add(new Country { Name = model.CountryName });
+                ApplicationDbContext.SaveChanges();
+            }
+
+            var parentLocation = ApplicationDbContext.Locations
+                .Where(x => x.Name.ToUpper() == model.ParentLocationName.ToUpper())
+                .Include(y => y.ParentLocation).Include(y => y.Country)
+                .FirstOrDefault(x => x.CountryId == country.Id && !x.ParentLocationId.HasValue);
+
+            if (parentLocation == null)
+            {
+                parentLocation =
+                    ApplicationDbContext.Locations.Add(new Location { Name = model.ParentLocationName, Country = country });
+                ApplicationDbContext.SaveChanges();
+            }
+
+            var userLocation = parentLocation;
+            if (!string.IsNullOrWhiteSpace(model.LocationName))
+            {
+                var location = ApplicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
+                    .Include(y => y.ParentLocation)
+                    .FirstOrDefault(x => x.ParentLocationId.HasValue && x.ParentLocationId.Value == parentLocation.Id);
+
+                if (location == null)
+                {
+                    location = ApplicationDbContext.Locations.Add(
+                        new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
+                    ApplicationDbContext.SaveChanges();
+                }
+
+                userLocation = location;
+            }
+
+            return userLocation;
         }
 
         #endregion
