@@ -251,6 +251,7 @@
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\ConditionController.cs" />
     <Compile Include="Controllers\CountryController.cs" />
+    <Compile Include="Controllers\ErrorPageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -300,6 +301,7 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ErrorPage.css" />
     <Content Include="Content\Images\edit.png" />
     <Content Include="Content\Images\delete.png" />
     <Content Include="Content\Images\horizontal_logo_small.png" />
@@ -415,6 +417,7 @@
     <Content Include="Views\Message\Edit.cshtml" />
     <Content Include="Views\Message\Index.cshtml" />
     <Content Include="Views\Shared\Info.cshtml" />
+    <Content Include="Views\ErrorPage\Oops.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Uploads\Originals\" />
