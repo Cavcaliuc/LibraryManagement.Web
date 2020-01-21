@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.Entity;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -89,22 +93,31 @@ namespace LibraryManagement.Web.Controllers
         public ActionResult Index(ManageAccountModel account)
         {
             string id = User.Identity.GetUserId();
-            var currentUser = ApplicationDbContext.Users.FirstOrDefault(u => u.Id == id) 
+            var currentUser = ApplicationDbContext.Users.FirstOrDefault(u => u.Id == id)
                               ?? throw new ArgumentNullException("User not found");
             var location = GetOrSaveUserLocation(account);
+
+            AddPhotoToViewModel(account);
 
             if (currentUser.UserName != account.UserName)
             {
                 currentUser.UserName = account.UserName;
             }
+
+            if (currentUser.Location != location)
+            {
+                currentUser.Location = location;
+            }
+
             if (currentUser.DateOfBirth != Encryption.Encrypt(account.DateOfBirth.ToString()))
             {
                 currentUser.DateOfBirth = Encryption.Encrypt(account.DateOfBirth.ToString());
             }
-            
-            if (currentUser.Location != location)
+
+            if (currentUser.Photo != account.Photo && account.Photo != null)
             {
-                currentUser.Location = location;
+                currentUser.Photo = account.Photo;
+                currentUser.PhotoThumbnail = account.PhotoThumbnail;
             }
 
             ApplicationDbContext.Entry(currentUser).State = EntityState.Modified;
@@ -390,6 +403,50 @@ namespace LibraryManagement.Web.Controllers
             ApplicationDbContext.SaveChanges();
             await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
         }
+
+        private void AddPhotoToViewModel(ManageAccountModel model)
+        {
+
+            if (model.FileUpload != null && model.FileUpload.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(model.FileUpload.FileName);
+                var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+                if (fileExtension != ".jpg" && fileExtension != ".gif" && fileExtension != ".png" && fileExtension != ".jpeg")
+                {
+                    ModelState.AddModelError("Photo", "Please add a valid image file format");
+                    return;
+                }
+
+                //attach the uploaded image to the object before saving to Database
+                //model.ImageMimeType = fileUpload.ContentLength;
+                model.Photo = new byte[model.FileUpload.ContentLength];
+                model.FileUpload.InputStream.Read(model.Photo, 0, model.FileUpload.ContentLength);
+
+                //Save image to file
+                var filename = model.FileUpload.FileName;
+                var filePathOriginal = Server.MapPath("/Content/Uploads/Originals");
+                var filePathThumbnail = Server.MapPath("/Content/Uploads/Thumbnails");
+                string savedFileName = Path.Combine(filePathOriginal, filename);
+                model.FileUpload.SaveAs(savedFileName);
+
+                //Read image back from file and create thumbnail from it
+                var imageFile = Path.Combine(Server.MapPath("~/Content/Uploads/Originals"), filename);
+                using (var srcImage = Image.FromFile(imageFile))
+                using (var newImage = new Bitmap(100, 100))
+                using (var graphics = Graphics.FromImage(newImage))
+                using (var stream = new MemoryStream())
+                {
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    graphics.DrawImage(srcImage, new Rectangle(0, 0, 100, 100));
+                    newImage.Save(stream, ImageFormat.Png);
+                    var thumbNew = File(stream.ToArray(), "image/png");
+                    model.PhotoThumbnail = thumbNew.FileContents;
+                }
+            }
+        }
+
 
         protected override void Dispose(bool disposing)
         {
