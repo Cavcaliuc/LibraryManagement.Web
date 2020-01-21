@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.Entity;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -79,38 +83,46 @@ namespace LibraryManagement.Web.Controllers
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
                 : "";
 
-            var userId = User.Identity.GetUserId();
-
-            var phoneNumber = await UserManager.GetPhoneNumberAsync(userId);
-            var model = new ManageAccountModel
-            {
-                HasPassword = HasPassword(),
-                PhoneNumber = !string.IsNullOrWhiteSpace(phoneNumber) ? Encryption.Decrypt(phoneNumber) : phoneNumber,
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
-            };
-
-            var user = ApplicationDbContext.Users
-                .Include(s => s.Location)
-                .FirstOrDefault(x => x.Id == userId);
-           
-            if (user != null)
-            {
-                model.UserName = user.UserName;
-                model.Email = Encryption.DecryptionForEmail(user.Email);
-                model.Photo = user.Photo;
-                model.PhotoThumbnail = user.PhotoThumbnail;
-                model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
-                model.LocationId = user.Location?.Id;
-                model.LocationName = user.Location?.Name;
-                model.ParentLocationId = user.Location?.ParentLocation?.Id;
-                model.ParentLocationName = user.Location?.ParentLocation?.Name;
-                model.CountryId = user.Location?.Country.Id;
-                model.CountryName = user.Location?.Country.Name;
-            }
+            ManageAccountModel model = await GetManageAccountModel();
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Index(ManageAccountModel account)
+        {
+            string id = User.Identity.GetUserId();
+            var currentUser = ApplicationDbContext.Users.FirstOrDefault(u => u.Id == id)
+                              ?? throw new ArgumentNullException("User not found");
+            var location = GetOrSaveUserLocation(account);
+
+            AddPhotoToViewModel(account);
+
+            if (currentUser.UserName != account.UserName)
+            {
+                currentUser.UserName = account.UserName;
+            }
+
+            if (currentUser.Location != location)
+            {
+                currentUser.Location = location;
+            }
+
+            if (currentUser.DateOfBirth != Encryption.Encrypt(account.DateOfBirth.ToString()))
+            {
+                currentUser.DateOfBirth = Encryption.Encrypt(account.DateOfBirth.ToString());
+            }
+
+            if (currentUser.Photo != account.Photo && account.Photo != null)
+            {
+                currentUser.Photo = account.Photo;
+                currentUser.PhotoThumbnail = account.PhotoThumbnail;
+            }
+
+            ApplicationDbContext.Entry(currentUser).State = EntityState.Modified;
+            ApplicationDbContext.SaveChanges();
+            return RedirectToAction("Index");
         }
 
         //
@@ -229,7 +241,7 @@ namespace LibraryManagement.Web.Controllers
                 {
                     user.PhoneNumber = Encryption.Encrypt(model.PhoneNumber);
                     user.Email = Encryption.EncryptionForEmail(user.Email);
-                   
+
                     ApplicationDbContext.Entry(user).State = EntityState.Modified;
                     ApplicationDbContext.SaveChanges();
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -392,6 +404,50 @@ namespace LibraryManagement.Web.Controllers
             await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
         }
 
+        private void AddPhotoToViewModel(ManageAccountModel model)
+        {
+
+            if (model.FileUpload != null && model.FileUpload.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(model.FileUpload.FileName);
+                var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+                if (fileExtension != ".jpg" && fileExtension != ".gif" && fileExtension != ".png" && fileExtension != ".jpeg")
+                {
+                    ModelState.AddModelError("Photo", "Please add a valid image file format");
+                    return;
+                }
+
+                //attach the uploaded image to the object before saving to Database
+                //model.ImageMimeType = fileUpload.ContentLength;
+                model.Photo = new byte[model.FileUpload.ContentLength];
+                model.FileUpload.InputStream.Read(model.Photo, 0, model.FileUpload.ContentLength);
+
+                //Save image to file
+                var filename = model.FileUpload.FileName;
+                var filePathOriginal = Server.MapPath("/Content/Uploads/Originals");
+                var filePathThumbnail = Server.MapPath("/Content/Uploads/Thumbnails");
+                string savedFileName = Path.Combine(filePathOriginal, filename);
+                model.FileUpload.SaveAs(savedFileName);
+
+                //Read image back from file and create thumbnail from it
+                var imageFile = Path.Combine(Server.MapPath("~/Content/Uploads/Originals"), filename);
+                using (var srcImage = Image.FromFile(imageFile))
+                using (var newImage = new Bitmap(100, 100))
+                using (var graphics = Graphics.FromImage(newImage))
+                using (var stream = new MemoryStream())
+                {
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    graphics.DrawImage(srcImage, new Rectangle(0, 0, 100, 100));
+                    newImage.Save(stream, ImageFormat.Png);
+                    var thumbNew = File(stream.ToArray(), "image/png");
+                    model.PhotoThumbnail = thumbNew.FileContents;
+                }
+            }
+        }
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && _userManager != null)
@@ -406,6 +462,41 @@ namespace LibraryManagement.Web.Controllers
             }
 
             base.Dispose(disposing);
+        }
+
+        private async Task<ManageAccountModel> GetManageAccountModel()
+        {
+            var userId = User.Identity.GetUserId();
+
+            var phoneNumber = await UserManager.GetPhoneNumberAsync(userId);
+            var model = new ManageAccountModel
+            {
+                HasPassword = HasPassword(),
+                PhoneNumber = !string.IsNullOrWhiteSpace(phoneNumber) ? Encryption.Decrypt(phoneNumber) : phoneNumber,
+                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
+                Logins = await UserManager.GetLoginsAsync(userId),
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+            };
+
+            var user = ApplicationDbContext.Users
+                .Include(s => s.Location)
+                .FirstOrDefault(x => x.Id == userId);
+
+            if (user != null)
+            {
+                model.UserName = user.UserName;
+                model.Email = Encryption.DecryptionForEmail(user.Email);
+                model.Photo = user.Photo;
+                model.PhotoThumbnail = user.PhotoThumbnail;
+                model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
+                model.LocationId = user.Location?.Id;
+                model.LocationName = user.Location?.Name;
+                model.ParentLocationId = user.Location?.ParentLocation?.Id;
+                model.ParentLocationName = user.Location?.ParentLocation?.Name;
+                model.CountryId = user.Location?.Country.Id;
+                model.CountryName = user.Location?.Country.Name;
+            }
+            return model;
         }
 
         #region Helpers
@@ -457,6 +548,45 @@ namespace LibraryManagement.Web.Controllers
             RemoveLoginSuccess,
             RemovePhoneSuccess,
             Error
+        }
+
+        private Location GetOrSaveUserLocation(ManageAccountModel model)
+        {
+            var country = ApplicationDbContext.Countries.FirstOrDefault(x => x.Name.ToUpper() == model.CountryName.ToUpper());
+            if (country == null)
+            {
+                country = ApplicationDbContext.Countries.Add(new Country { Name = model.CountryName });
+                ApplicationDbContext.SaveChanges();
+            }
+
+            var parentLocation = ApplicationDbContext.Locations
+                .Where(x => x.Name.ToUpper() == model.ParentLocationName.ToUpper())
+                .Include(y => y.ParentLocation).Include(y => y.Country)
+                .FirstOrDefault(x => x.CountryId == country.Id && !x.ParentLocationId.HasValue);
+
+            if (parentLocation == null)
+            {
+                parentLocation =
+                    ApplicationDbContext.Locations.Add(new Location { Name = model.ParentLocationName, Country = country });
+                ApplicationDbContext.SaveChanges();
+            }
+
+            var userLocation = parentLocation;
+            if (string.IsNullOrWhiteSpace(model.LocationName)) return userLocation;
+
+            var location = ApplicationDbContext.Locations.Where(x => x.Name.ToUpper() == model.LocationName.ToUpper())
+                .Include(y => y.ParentLocation)
+                .FirstOrDefault(x => x.ParentLocationId.HasValue && x.ParentLocationId.Value == parentLocation.Id);
+
+            if (location == null)
+            {
+                location = ApplicationDbContext.Locations.Add(
+                    new Location { Name = model.LocationName, Country = country, ParentLocation = parentLocation });
+                ApplicationDbContext.SaveChanges();
+            }
+
+            userLocation = location;
+            return userLocation;
         }
 
         #endregion

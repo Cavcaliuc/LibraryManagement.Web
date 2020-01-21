@@ -327,6 +327,25 @@ namespace LibraryManagement.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        public void AddMessage(int id, string message)
+        {
+            Order order = ApplicationDbContext.Orders.Find(id);
+
+            if (order != null)
+            {
+                order.Messages.Add(new Message
+                {
+                    Text = Encryption.Encrypt(message),
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = UserManager.FindById(System.Web.HttpContext.Current.User.Identity.GetUserId())
+                });
+
+                ApplicationDbContext.Entry(order).State = EntityState.Modified;
+            }
+
+            ApplicationDbContext.SaveChangesAsync();
+        }
+
         private static OrderModel MapToOrderModel(Stock stock)
         {
             var orderModel = new OrderModel
@@ -443,19 +462,5 @@ namespace LibraryManagement.Web.Controllers
             base.Dispose(disposing);
         }
 
-        public void AddMessage(int id, string message)
-        {
-            Order order = ApplicationDbContext.Orders.Find(id);
-
-            order.Messages.Add(new Message
-            {
-                Text = Encryption.Encrypt(message),
-                CreatedDate = DateTime.UtcNow,
-                CreatedBy = UserManager.FindById(System.Web.HttpContext.Current.User.Identity.GetUserId())
-            });
-
-            ApplicationDbContext.Entry(order).State = EntityState.Modified;
-            ApplicationDbContext.SaveChangesAsync();
-        }
     }
 }
