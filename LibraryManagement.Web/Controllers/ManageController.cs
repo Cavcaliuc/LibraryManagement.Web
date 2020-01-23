@@ -99,11 +99,6 @@ namespace LibraryManagement.Web.Controllers
 
             AddPhotoToViewModel(account);
 
-            if (currentUser.UserName != account.UserName)
-            {
-                currentUser.UserName = account.UserName;
-            }
-
             if (currentUser.Location != location)
             {
                 currentUser.Location = location;
@@ -489,10 +484,10 @@ namespace LibraryManagement.Web.Controllers
                 model.Photo = user.Photo;
                 model.PhotoThumbnail = user.PhotoThumbnail;
                 model.DateOfBirth = !string.IsNullOrWhiteSpace(user.DateOfBirth) ? DateTime.Parse(Encryption.Decrypt(user.DateOfBirth)) : (DateTime?)null;
-                model.LocationId = user.Location?.Id;
-                model.LocationName = user.Location?.Name;
-                model.ParentLocationId = user.Location?.ParentLocation?.Id;
-                model.ParentLocationName = user.Location?.ParentLocation?.Name;
+                model.LocationId = user.Location?.ParentLocation != null ? user.Location?.Id : null;
+                model.LocationName = user.Location?.ParentLocation != null ? user.Location?.Name : null;
+                model.ParentLocationId = user.Location?.ParentLocation == null ? user.Location?.Id : user.Location?.ParentLocation.Id;
+                model.ParentLocationName = user.Location?.ParentLocation == null ? user.Location?.Name : user.Location?.ParentLocation.Name;
                 model.CountryId = user.Location?.Country.Id;
                 model.CountryName = user.Location?.Country.Name;
             }
